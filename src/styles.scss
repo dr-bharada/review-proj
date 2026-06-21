@@ -8,6 +8,46 @@
   --color-primary-500: #8b5cf6;
   --color-primary-600: #7c3aed;
   --color-primary-700: #6d28d9;
+
+  /* Google */
+  --color-platform-google-bg: rgba(30, 58, 138, 0.6);
+  --color-platform-google-text: #60a5fa;
+  --background-image-platform-google-bar: linear-gradient(to right, #2563eb, #60a5fa);
+
+  /* Facebook */
+  --color-platform-facebook-bg: rgba(30, 58, 138, 0.6);
+  --color-platform-facebook-text: #3b82f6;
+  --background-image-platform-facebook-bar: linear-gradient(to right, #1d4ed8, #3b82f6);
+
+  /* Instagram */
+  --color-platform-instagram-bg: rgba(131, 24, 67, 0.6);
+  --color-platform-instagram-text: #f472b6;
+  --background-image-platform-instagram-bar: linear-gradient(to right, #db2777, #fb7185);
+
+  /* Zomato */
+  --color-platform-zomato-bg: rgba(127, 29, 29, 0.6);
+  --color-platform-zomato-text: #f87171;
+  --background-image-platform-zomato-bar: linear-gradient(to right, #dc2626, #f87171);
+
+  /* Swiggy */
+  --color-platform-swiggy-bg: rgba(124, 45, 18, 0.6);
+  --color-platform-swiggy-text: #fb923c;
+  --background-image-platform-swiggy-bar: linear-gradient(to right, #ea580c, #fb923c);
+
+  /* TripAdvisor */
+  --color-platform-tripadvisor-bg: rgba(20, 83, 45, 0.6);
+  --color-platform-tripadvisor-text: #4ade80;
+  --background-image-platform-tripadvisor-bar: linear-gradient(to right, #16a34a, #34d399);
+
+  /* Trustpilot */
+  --color-platform-trustpilot-bg: rgba(6, 78, 59, 0.6);
+  --color-platform-trustpilot-text: #34d399;
+  --background-image-platform-trustpilot-bar: linear-gradient(to right, #059669, #2dd4bf);
+
+  /* Default / Fallback */
+  --color-platform-default-bg: rgba(76, 29, 149, 0.6);
+  --color-platform-default-text: #c084fc;
+  --background-image-platform-default-bar: linear-gradient(to right, #7c3aed, #d946ef);
 }
 
 body {
