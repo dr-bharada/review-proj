@@ -1,4 +1,12 @@
-import { Component, inject, ViewEncapsulation, type AfterViewInit, type OnDestroy, ElementRef, viewChild } from "@angular/core";
+import {
+  Component,
+  inject,
+  ViewEncapsulation,
+  type AfterViewInit,
+  type OnDestroy,
+  ElementRef,
+  viewChild,
+} from "@angular/core";
 import { RouterModule } from "@angular/router";
 import { CardModule } from "primeng/card";
 import { InputTextModule } from "primeng/inputtext";
@@ -63,7 +71,9 @@ export class SignupComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     // Add title/aria-label to password toggle eye icons
-    const toggleIcons = this.hostEl.nativeElement.querySelectorAll(".p-password-toggle-mask-icon");
+    const toggleIcons = this.hostEl.nativeElement.querySelectorAll(
+      ".p-password-toggle-mask-icon",
+    );
     toggleIcons.forEach((icon: Element) => {
       icon.setAttribute("title", "Toggle password visibility");
       icon.setAttribute("aria-label", "Toggle password visibility");
@@ -109,16 +119,30 @@ export class SignupComponent implements AfterViewInit, OnDestroy {
     }
     const passwordElRef = this.passwordRef();
     if (passwordElRef) {
-      const passwordEl = passwordElRef.nativeElement.querySelector("input") as HTMLInputElement;
-      if (passwordEl && passwordEl.value !== this.signupForm.controls.password.value) {
+      const passwordEl = passwordElRef.nativeElement.querySelector(
+        "input",
+      ) as HTMLInputElement;
+      if (
+        passwordEl &&
+        passwordEl.value !== this.signupForm.controls.password.value
+      ) {
         this.signupForm.controls.password.setValue(passwordEl.value);
       }
     }
     const confirmPasswordElRef = this.confirmPasswordRef();
     if (confirmPasswordElRef) {
-      const confirmPasswordEl = confirmPasswordElRef.nativeElement.querySelector("input") as HTMLInputElement;
-      if (confirmPasswordEl && confirmPasswordEl.value !== this.signupForm.controls.confirmPassword.value) {
-        this.signupForm.controls.confirmPassword.setValue(confirmPasswordEl.value);
+      const confirmPasswordEl =
+        confirmPasswordElRef.nativeElement.querySelector(
+          "input",
+        ) as HTMLInputElement;
+      if (
+        confirmPasswordEl &&
+        confirmPasswordEl.value !==
+          this.signupForm.controls.confirmPassword.value
+      ) {
+        this.signupForm.controls.confirmPassword.setValue(
+          confirmPasswordEl.value,
+        );
       }
     }
   }

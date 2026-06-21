@@ -13,6 +13,10 @@ export const routes: Routes = [
   {
     path: "auth",
     canActivate: [nonAuthGuard],
+    loadComponent: () =>
+      import("./features/auth/auth-layout.component").then(
+        (m) => m.AuthLayoutComponent,
+      ),
     children: [
       {
         path: "login",

@@ -1,0 +1,53 @@
+<div class="min-h-screen flex flex-col bg-slate-950 relative overflow-hidden">
+  <!-- Ambient background glows -->
+  <div
+    class="fixed top-0 left-0 w-[600px] h-[600px] rounded-full bg-violet-600/5 blur-[150px] pointer-events-none -translate-x-1/3 -translate-y-1/3">
+  </div>
+  <div
+    class="fixed bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-fuchsia-600/5 blur-[150px] pointer-events-none translate-x-1/4 translate-y-1/4">
+  </div>
+
+  <!-- Floating Navbar (Matches Landing Page Style) -->
+  <div class="pt-4 w-full z-50">
+    <nav class="max-w-5xl mx-auto px-4 sm:px-6 w-full">
+      <div
+        class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 px-6 py-3.5 rounded-2xl grid grid-cols-[1fr_auto_1fr] items-center shadow-2xl">
+
+        <!-- Left Column: Home Link -->
+        <div class="flex justify-start">
+          <a routerLink="/"
+            class="group inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-slate-200 transition-colors cursor-pointer">
+            <i class="pi pi-arrow-left text-[9px] group-hover:-translate-x-0.5 transition-transform duration-200"></i>
+            <span>Home</span>
+          </a>
+        </div>
+
+        <!-- Center Column: Logo (Matches Home Page Branding) -->
+        <div class="flex justify-center">
+          <a routerLink="/" class="flex items-center gap-3 hover:opacity-90 transition-opacity">
+            <div
+              class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-500/25 flex-shrink-0">
+              <i class="pi pi-star-fill text-white text-xs"></i>
+            </div>
+            <span
+              class="text-base font-extrabold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent tracking-wide">ReviewBoost</span>
+          </a>
+        </div>
+
+        <!-- Right Column: Spacer to balance layout -->
+        <div class="flex justify-end"></div>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Centered Form Container -->
+  <main class="flex-1 flex items-center justify-center px-4 py-8 sm:px-6 relative z-10">
+    <div class="max-w-[420px] w-full">
+      <!-- Layout Form Container -->
+      <div
+        class="border border-slate-800 bg-slate-900/40 backdrop-blur-md rounded-2xl shadow-2xl shadow-violet-950/10 p-6 sm:p-8">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </main>
+</div>
