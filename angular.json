@@ -37,8 +37,18 @@
             "scripts": [],
             "stylePreprocessorOptions": {
               "sass": {
-                "silenceDeprecations": ["import"]
+                "silenceDeprecations": [
+                  "import"
+                ]
               }
+            },
+            "server": "src/main.server.ts",
+            "outputMode": "server",
+            "security": {
+              "allowedHosts": []
+            },
+            "ssr": {
+              "entry": "src/server.ts"
             }
           },
           "configurations": {
