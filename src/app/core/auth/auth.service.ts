@@ -15,7 +15,7 @@ export class AuthService {
       this.supabaseService.supabase.auth.signUp({
         email,
         password,
-      })
+      }),
     );
   }
 
@@ -25,7 +25,7 @@ export class AuthService {
       this.supabaseService.supabase.auth.signInWithPassword({
         email,
         password,
-      })
+      }),
     );
   }
 
@@ -45,7 +45,7 @@ export class AuthService {
       }) as Promise<{
         data: Record<string, never>;
         error: AuthError | null;
-      }>
+      }>,
     );
   }
 
@@ -54,7 +54,7 @@ export class AuthService {
     return from(
       this.supabaseService.supabase.auth.updateUser({
         password,
-      }) as Promise<UserResponseMock>
+      }) as Promise<UserResponseMock>,
     );
   }
 }
@@ -64,4 +64,3 @@ interface UserResponseMock {
   data: { user: User | null };
   error: AuthError | null;
 }
-
