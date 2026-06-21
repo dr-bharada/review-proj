@@ -30,11 +30,15 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
   // ── State ────────────────────────────────────────────────────────────────
   readonly isLoading = signal(true);
   readonly stats = signal<PlatformStat[]>([]);
+  readonly totalClicks = signal<number>(0);
+  readonly totalScans = signal<number>(0);
 
   // ── Derived ──────────────────────────────────────────────────────────────
-  readonly totalClicks = computed(() =>
-    this.stats().reduce((sum, s) => sum + s.count, 0),
-  );
+  readonly clickThroughRate = computed(() => {
+    const scans = this.totalScans();
+    if (scans === 0) return 0;
+    return Math.round((this.totalClicks() / scans) * 100);
+  });
 
   readonly maxClicks = computed(() => {
     const s = this.stats();
@@ -49,17 +53,19 @@ export class AnalyticsComponent implements OnInit, OnDestroy {
   constructor() {
     this.load$
       .pipe(
-        tap(() => this.isLoading.set(true)),
-        switchMap(() =>
-          this.analyticsService.getAnalyticsStats(this.businessId()).pipe(
-            tap(({ data, error }) => {
-              if (!error && data) {
-                this.stats.set(data);
-              } else {
-                console.error("Failed to load analytics", error);
-              }
-              this.isLoading.set(false);
-            }),
+          tap(() => this.isLoading.set(true)),
+          switchMap(() =>
+            this.analyticsService.getAnalyticsStats(this.businessId()).pipe(
+              tap(({ data, error }) => {
+                if (!error && data) {
+                  this.stats.set(data.stats);
+                  this.totalClicks.set(data.totalClicks);
+                  this.totalScans.set(data.totalScans);
+                } else {
+                  console.error("Failed to load analytics", error);
+                }
+                this.isLoading.set(false);
+              }),
             catchError((err: unknown) => {
               console.error("Failed to load analytics", err);
               this.isLoading.set(false);
