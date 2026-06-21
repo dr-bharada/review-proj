@@ -3,8 +3,8 @@
   <!-- Section header -->
   <div class="flex items-center gap-3">
     <div
-      class="w-10 h-10 rounded-xl bg-fuchsia-900/50 border border-fuchsia-700/40 flex items-center justify-center flex-shrink-0">
-      <i class="pi pi-qrcode text-fuchsia-400"></i>
+      class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-900/60 to-fuchsia-900/40 border border-violet-700/40 flex items-center justify-center flex-shrink-0 shadow-lg shadow-violet-500/10">
+      <i class="pi pi-qrcode text-violet-400 text-base"></i>
     </div>
     <div>
       <h2 class="text-lg font-bold text-slate-100">QR Code</h2>
@@ -13,139 +13,249 @@
   </div>
 
   <!-- Loading state -->
-  @if (isLoading()) {
+  @if (store.isLoading()) {
   <div class="flex items-center justify-center p-16 bg-slate-900/50 border border-slate-800/60 rounded-2xl">
     <div class="flex flex-col items-center gap-3">
-      <div class="w-10 h-10 rounded-full border-2 border-fuchsia-500 border-t-transparent animate-spin"></div>
-      <p class="text-sm text-slate-400">Loading your QR code...</p>
+      <div class="w-10 h-10 rounded-full border-2 border-violet-500 border-t-transparent animate-spin"></div>
+      <p class="text-sm text-slate-400 font-medium">Loading your QR code...</p>
     </div>
   </div>
 
   } @else {
 
-  <!-- ── ACTIVE STATE (QR code exists) ── -->
-  @if (qrCode()) {
+  <!-- ══════════════════════════════════════
+       ACTIVE STATE — QR code exists
+  ══════════════════════════════════════ -->
+  @if (store.qrCode()) {
   <div
-    class="relative overflow-hidden bg-slate-900/70 backdrop-blur-md border border-slate-800/80 rounded-2xl shadow-xl p-6 space-y-6">
-    <!-- ambient glow -->
-    <div class="absolute top-0 right-0 w-48 h-48 bg-fuchsia-500/5 rounded-full blur-2xl pointer-events-none"></div>
+    class="relative overflow-hidden bg-slate-900/70 backdrop-blur-md border border-slate-800/80 rounded-2xl shadow-xl">
 
-    <!-- success badge -->
-    <div class="flex items-center gap-2">
-      <span
-        class="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-800/50 px-2.5 py-1 rounded-full">
-        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-        Active &amp; Live
-      </span>
+    <div
+      class="absolute -top-16 -right-16 w-64 h-64 bg-violet-600/8 rounded-full blur-3xl pointer-events-none"></div>
+    <div
+      class="absolute -bottom-16 -left-16 w-64 h-64 bg-fuchsia-600/8 rounded-full blur-3xl pointer-events-none"></div>
+    <div
+      class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-violet-500 to-fuchsia-500 rounded-t-2xl">
     </div>
 
-    <p class="text-slate-400 text-sm leading-relaxed">
-      Your review QR code is live. Print it, frame it, or share the link — customers scan it to leave reviews instantly.
-    </p>
+    <div class="p-6 space-y-5 relative">
 
-    <!-- QR code display -->
-    <div class="flex justify-center">
-      <div class="relative">
+      <!-- Status row -->
+      <div class="flex items-center justify-between">
+        <span
+          class="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-800/50 px-3 py-1.5 rounded-full">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          Active &amp; Live
+        </span>
+        <span class="text-[11px] text-slate-500">Print · Frame · Share</span>
+      </div>
+
+      <!-- Branded preview card -->
+      <div class="flex justify-center">
+        <div class="relative w-full max-w-[320px]">
+          <div
+            class="absolute inset-0 rounded-[28px] bg-gradient-to-br from-violet-500/25 to-fuchsia-500/20 blur-2xl scale-110 pointer-events-none">
+          </div>
+
+          <div class="relative rounded-[24px] overflow-hidden border border-violet-500/25 shadow-2xl"
+            style="background: linear-gradient(145deg, #110d20 0%, #0c1020 60%, #0d0b1a 100%)">
+            <div class="h-[2px]"
+              style="background: linear-gradient(90deg, transparent, #8b5cf6 30%, #d946ef 70%, transparent)"></div>
+
+            <div class="absolute top-4 left-5 w-1 h-1 rounded-full bg-violet-400/40"></div>
+            <div class="absolute top-8 right-8 w-1.5 h-1.5 rounded-full bg-fuchsia-400/30"></div>
+            <div class="absolute bottom-14 left-8 w-1 h-1 rounded-full bg-violet-300/30"></div>
+
+            <div class="px-7 pt-7 pb-6 flex flex-col items-center gap-4">
+
+              <!-- Icon badge -->
+              <div class="relative">
+                <div
+                  class="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500/30 to-fuchsia-500/20 border border-violet-500/40 flex items-center justify-center shadow-xl shadow-violet-500/20">
+                  <span class="text-3xl leading-none"
+                    style="filter: drop-shadow(0 0 8px rgba(167,139,250,0.6))">★</span>
+                </div>
+                <div
+                  class="absolute inset-0 rounded-2xl bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 blur-md scale-125 -z-10">
+                </div>
+              </div>
+
+              <!-- Text -->
+              <div class="text-center space-y-1">
+                <p
+                  class="text-[9px] font-black tracking-[4px] uppercase bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+                  Scan to Review
+                </p>
+                <h3 class="text-xl font-black text-slate-50 leading-tight truncate max-w-[220px]">
+                  {{ store.displayName() || store.qrCode()?.slug }}
+                </h3>
+                <p class="text-[11px] text-slate-500">Share with your customers</p>
+              </div>
+
+              <!-- QR code with corner brackets -->
+              <div class="relative p-1">
+                <div
+                  class="absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 border-violet-400/70 rounded-tl-lg">
+                </div>
+                <div
+                  class="absolute top-0 right-0 w-5 h-5 border-t-2 border-r-2 border-fuchsia-400/70 rounded-tr-lg">
+                </div>
+                <div
+                  class="absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 border-fuchsia-400/70 rounded-bl-lg">
+                </div>
+                <div
+                  class="absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 border-violet-400/70 rounded-br-lg">
+                </div>
+                <div class="bg-white rounded-xl p-3.5 shadow-2xl shadow-violet-500/15"
+                  style="box-shadow: 0 0 0 1px rgba(139,92,246,0.2), 0 20px 60px rgba(139,92,246,0.15)">
+                  <img [src]="store.qrImageUrl()" alt="Your Review QR Code" class="w-40 h-40 object-contain block" />
+                </div>
+              </div>
+
+              <!-- URL pill -->
+              <div class="w-full flex items-center gap-2 rounded-full px-3.5 py-2 border border-violet-500/20"
+                style="background: rgba(13,11,24,0.8)">
+                <i class="pi pi-link text-violet-500 text-[10px] flex-shrink-0"></i>
+                <span class="text-[10px] text-slate-400 font-mono truncate">{{ store.publicUrl() }}</span>
+              </div>
+
+              <!-- Stars -->
+              <div class="flex items-center gap-0.5">
+                @for (s of [1,2,3,4,5]; track s) {
+                <span class="text-amber-400 text-base leading-none"
+                  style="filter: drop-shadow(0 0 3px rgba(251,191,36,0.4))">★</span>
+                }
+              </div>
+
+              <p class="text-[9px] font-semibold uppercase tracking-[2px] text-slate-600 pb-1">
+                Powered by Review Platform
+              </p>
+            </div>
+
+            <div class="h-[1px]"
+              style="background: linear-gradient(90deg, transparent, rgba(139,92,246,0.2), transparent)"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Copy URL row -->
+      <div class="flex items-center gap-2">
         <div
-          class="absolute inset-0 rounded-2xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 blur-xl scale-110">
+          class="flex-1 flex items-center gap-3 bg-slate-950/80 border border-slate-800/80 rounded-xl px-4 py-3 min-w-0">
+          <i class="pi pi-link text-slate-500 text-sm flex-shrink-0"></i>
+          <span class="text-sm text-slate-300 font-mono truncate">{{ store.publicUrl() }}</span>
         </div>
-        <div class="relative bg-white p-4 rounded-2xl shadow-2xl shadow-fuchsia-500/10 border border-slate-700/20">
-          <img [src]="qrImageUrl()" alt="Your Review QR Code" class="w-52 h-52 object-contain" />
-        </div>
+        <button (click)="copyLink()"
+          [class]="copied()
+            ? 'flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-xl bg-emerald-900/50 border border-emerald-700/50 text-emerald-400 transition-all duration-200'
+            : 'flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-xl bg-slate-800/80 border border-slate-700/60 text-slate-400 hover:text-slate-200 hover:bg-slate-700/60 cursor-pointer transition-all duration-200 active:scale-95'"
+          [title]="copied() ? 'Copied!' : 'Copy link'">
+          <i [class]="copied() ? 'pi pi-check text-sm' : 'pi pi-copy text-sm'"></i>
+        </button>
       </div>
-    </div>
 
-    <!-- Public URL row -->
-    <div class="flex items-center gap-2">
-      <div
-        class="flex-1 flex items-center gap-3 bg-slate-950/80 border border-slate-800/80 rounded-xl px-4 py-3 min-w-0">
-        <i class="pi pi-link text-slate-500 text-sm flex-shrink-0"></i>
-        <span class="text-sm text-slate-300 font-mono truncate">{{ publicUrl() }}</span>
+      <!-- Action buttons -->
+      <div class="flex gap-3">
+        <a [href]="store.publicUrl()" target="_blank" rel="noopener noreferrer"
+          class="flex-1 h-12 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 hover:border-slate-600/80 text-slate-300 hover:text-white text-sm font-semibold rounded-xl cursor-pointer flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98] no-underline">
+          <i class="pi pi-external-link text-sm"></i>
+          Preview Page
+        </a>
+
+        <button (click)="downloadQrCode()" [disabled]="isDownloading()"
+          class="flex-1 h-12 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl shadow-lg shadow-violet-500/25 cursor-pointer flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98]">
+          @if (isDownloading()) {
+          <span class="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
+          Preparing...
+          } @else {
+          <i class="pi pi-download text-sm"></i>
+          Download QR
+          }
+        </button>
       </div>
-      <button (click)="copyLink()"
-        [class]="copied()
-              ? 'flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-xl bg-emerald-900/50 border border-emerald-700/50 text-emerald-400 transition-all duration-200'
-              : 'flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-xl bg-slate-800/80 border border-slate-700/60 text-slate-400 hover:text-slate-200 hover:bg-slate-700/60 cursor-pointer transition-all duration-200 active:scale-95'"
-        title="Copy link">
-        <i [class]="copied() ? 'pi pi-check text-sm' : 'pi pi-copy text-sm'"></i>
-      </button>
-    </div>
 
-    <!-- Action buttons row -->
-    <div class="flex gap-3">
-      <!-- Preview / Test button -->
-      <a [href]="publicUrl()" target="_blank" rel="noopener noreferrer"
-        class="flex-1 h-12 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 hover:border-slate-600/80 text-slate-300 hover:text-white text-sm font-semibold rounded-xl cursor-pointer flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98] no-underline"
-        title="Open your public review page to verify it works">
-        <i class="pi pi-external-link text-sm"></i>
-        Preview Page
-      </a>
-
-      <!-- Download button -->
-      <button (click)="downloadQrCode()"
-        class="flex-1 h-12 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white text-sm font-semibold rounded-xl shadow-lg shadow-violet-500/20 cursor-pointer flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98]">
-        <i class="pi pi-download text-sm"></i>
-        Download QR
-      </button>
     </div>
   </div>
 
   } @else {
 
-  <!-- ── CLAIM STATE (no QR code yet) ── -->
+  <!-- ══════════════════════════════════════
+       CLAIM STATE — no QR code yet
+  ══════════════════════════════════════ -->
   <div
-    class="relative overflow-hidden bg-slate-900/70 backdrop-blur-md border border-slate-800/80 rounded-2xl shadow-xl p-6 space-y-6">
-    <!-- ambient glow -->
+    class="relative overflow-hidden bg-slate-900/70 backdrop-blur-md border border-slate-800/80 rounded-2xl shadow-xl">
+
+    <div
+      class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-violet-500 to-fuchsia-500 rounded-t-2xl">
+    </div>
     <div class="absolute top-0 right-0 w-48 h-48 bg-violet-500/5 rounded-full blur-2xl pointer-events-none"></div>
 
-    <!-- Info banner -->
-    <div class="flex items-start gap-3 p-4 bg-violet-900/20 border border-violet-800/40 rounded-xl">
-      <i class="pi pi-info-circle text-violet-400 mt-0.5 flex-shrink-0"></i>
-      <p class="text-sm text-slate-300 leading-relaxed">
-        Claim your unique public URL. Choose a short, memorable slug — it can't be changed later.
-      </p>
-    </div>
+    <div class="p-6 space-y-5">
 
-    <!-- Slug input -->
-    <div class="space-y-2">
-      <label for="slug" class="text-sm font-semibold text-slate-300">Choose your slug</label>
-
-      <div class="flex rounded-xl overflow-hidden border transition-all duration-200"
-        [class]="error()
-              ? 'border-rose-500/70'
-              : 'border-slate-700/60 focus-within:border-violet-500/70 focus-within:shadow-[0_0_0_3px_rgba(139,92,246,0.12)]'">
-        <!-- prefix -->
+      <!-- Illustration -->
+      <div class="flex flex-col items-center gap-3 py-4">
         <div
-          class="flex items-center bg-slate-950 px-3 border-r border-slate-700/60 text-slate-500 font-mono text-xs whitespace-nowrap flex-shrink-0">
-          {{ siteUrl }}/r/
+          class="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-900/60 to-fuchsia-900/40 border border-violet-700/40 flex items-center justify-center shadow-xl shadow-violet-500/10">
+          <i class="pi pi-qrcode text-4xl text-violet-400"></i>
         </div>
-        <!-- input -->
-        <input id="slug" type="text" [(ngModel)]="desiredSlug" placeholder="e.g. saffron-cafe"
-          [attr.aria-invalid]="error() ? 'true' : 'false'" (input)="error.set(null)" (keyup.enter)="claimSlug()"
-          class="flex-1 min-w-0 bg-slate-950 text-slate-100 placeholder-slate-600 px-4 py-3 text-sm focus:outline-none" />
+        <div class="text-center space-y-1">
+          <h3 class="text-base font-bold text-slate-100">Claim Your Review Link</h3>
+          <p class="text-xs text-slate-500 leading-relaxed max-w-xs">
+            Choose a short, memorable URL — it's permanent and will be embedded in your QR code.
+          </p>
+        </div>
       </div>
 
-      @if (error()) {
-      <p class="text-xs text-rose-400 flex items-center gap-1.5 mt-1">
-        <i class="pi pi-exclamation-circle text-[11px]"></i>
-        {{ error() }}
-      </p>
-      } @else {
-      <p class="text-xs text-slate-500">Only lowercase letters, numbers, and hyphens.</p>
-      }
-    </div>
+      <!-- Info banner -->
+      <div class="flex items-start gap-3 p-3.5 bg-violet-900/15 border border-violet-800/30 rounded-xl">
+        <i class="pi pi-info-circle text-violet-400 mt-0.5 flex-shrink-0 text-sm"></i>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Your slug becomes
+          <span class="text-violet-300 font-mono">yoursite.com/r/<em>your-slug</em></span>.
+          Choose wisely — it can't be changed later.
+        </p>
+      </div>
 
-    <!-- Submit button -->
-    <button (click)="claimSlug()" [disabled]="isSubmitting()"
-      class="w-full h-12 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl shadow-lg shadow-violet-500/20 cursor-pointer flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98]">
-      @if (isSubmitting()) {
-      <span class="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
-      Generating...
-      } @else {
-      <i class="pi pi-check text-sm"></i>
-      Claim &amp; Generate QR
-      }
-    </button>
+      <!-- Slug input -->
+      <div class="space-y-2">
+        <label for="slug" class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Your Slug</label>
+        <div class="flex rounded-xl overflow-hidden border transition-all duration-200"
+          [class]="store.error()
+            ? 'border-rose-500/70 shadow-[0_0_0_3px_rgba(239,68,68,0.08)]'
+            : 'border-slate-700/60 focus-within:border-violet-500/70 focus-within:shadow-[0_0_0_3px_rgba(139,92,246,0.12)]'">
+          <div
+            class="flex items-center bg-slate-950 px-3 border-r border-slate-700/60 text-slate-500 font-mono text-xs whitespace-nowrap flex-shrink-0">
+            {{ siteUrl }}/r/
+          </div>
+          <input id="slug" type="text" [(ngModel)]="desiredSlug" placeholder="e.g. saffron-cafe"
+            [attr.aria-invalid]="store.error() ? 'true' : 'false'"
+            (input)="clearError()"
+            (keyup.enter)="claimSlug()"
+            class="flex-1 min-w-0 bg-slate-950 text-slate-100 placeholder-slate-600 px-4 py-3 text-sm focus:outline-none" />
+        </div>
+
+        @if (store.error()) {
+        <p class="text-xs text-rose-400 flex items-center gap-1.5">
+          <i class="pi pi-exclamation-circle text-[11px]"></i> {{ store.error() }}
+        </p>
+        } @else {
+        <p class="text-xs text-slate-500">Lowercase letters, numbers, and hyphens only.</p>
+        }
+      </div>
+
+      <!-- Submit -->
+      <button (click)="claimSlug()" [disabled]="store.isClaiming()"
+        class="w-full h-12 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl shadow-lg shadow-violet-500/20 cursor-pointer flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98]">
+        @if (store.isClaiming()) {
+        <span class="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
+        Generating your QR code...
+        } @else {
+        <i class="pi pi-sparkles text-sm"></i>
+        Claim &amp; Generate QR Code
+        }
+      </button>
+
+    </div>
   </div>
   }
   }

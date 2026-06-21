@@ -5,7 +5,6 @@ import { ButtonModule } from "primeng/button";
 import { FormsModule } from "@angular/forms";
 import type { ReviewLink } from "../../core/models";
 import { PublicStore } from "../../state/public";
-import { AnalyticsService } from "../../core/services/analytics.service";
 import {
   getPlatformIcon,
   getPlatformButtonClasses,
@@ -20,7 +19,6 @@ import {
 })
 export class PublicReviewPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
-  private readonly analyticsService = inject(AnalyticsService);
   readonly store = inject(PublicStore);
 
   ngOnInit() {
@@ -37,15 +35,7 @@ export class PublicReviewPageComponent implements OnInit {
   }
 
   onLinkClick(link: ReviewLink) {
-    // Log the click asynchronously (don't wait for it to finish before opening the window)
-    this.analyticsService
-      .logClick(link.business_id, link.platform_name)
-      .subscribe({
-        error: (err) => {
-          console.error("Failed to log analytics event", err);
-        },
-      });
-
+    this.store.logLinkClick(link.business_id, link.platform_name);
     window.open(link.platform_url, "_blank", "noopener,noreferrer");
   }
 

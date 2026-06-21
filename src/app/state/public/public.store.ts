@@ -42,6 +42,12 @@ export const PublicStore = signalStore(
       publicService = inject(PublicService),
       analyticsService = inject(AnalyticsService),
     ) => ({
+      logLinkClick(businessId: string, platformName: string): void {
+        analyticsService.logClick(businessId, platformName).subscribe({
+          error: (err) => console.error("Failed to log click event", err),
+        });
+      },
+
       selectRating(rating: number): void {
         patchState(store, { ratingSelected: rating });
       },
