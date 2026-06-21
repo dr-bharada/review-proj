@@ -1,6 +1,10 @@
 import { Injectable, inject } from "@angular/core";
 import { SupabaseService } from "../services/supabase.service";
-import type { User, AuthResponse, AuthError } from "@supabase/supabase-js";
+import type {
+  AuthResponse,
+  AuthError,
+  UserResponse,
+} from "@supabase/supabase-js";
 import { from, type Observable } from "rxjs";
 
 @Injectable({
@@ -50,17 +54,11 @@ export class AuthService {
   }
 
   // Set a new password for the current user session
-  updateUserPassword(password: string): Observable<UserResponseMock> {
+  updateUserPassword(password: string): Observable<UserResponse> {
     return from(
       this.supabaseService.supabase.auth.updateUser({
         password,
-      }) as Promise<UserResponseMock>,
+      }),
     );
   }
-}
-
-// Minimal interface for Supabase Update User Response
-interface UserResponseMock {
-  data: { user: User | null };
-  error: AuthError | null;
 }
