@@ -6,40 +6,49 @@ import {
   input,
   type OnInit,
 } from "@angular/core";
-import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
+import {
+  FormBuilder,
+  type FormControl,
+  type FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from "@angular/forms";
 import type { ReviewLink } from "../../core/models";
 import { InputTextModule } from "primeng/inputtext";
 import { ButtonModule } from "primeng/button";
-import { DropdownModule } from "primeng/dropdown";
+import { SelectModule } from "primeng/select";
 import { ReviewLinksStore } from "../../state/review-links/review-links.store";
 import { getPlatformIcon } from "../../shared/utils";
 
+interface ReviewLinkForm {
+  platform_name: FormControl<string>;
+  platform_url: FormControl<string>;
+}
+
 @Component({
   selector: "app-review-links",
-  imports: [ReactiveFormsModule, InputTextModule, ButtonModule, DropdownModule],
+  imports: [ReactiveFormsModule, InputTextModule, ButtonModule, SelectModule],
   templateUrl: "./review-links.component.html",
 })
 export class ReviewLinksComponent implements OnInit {
   readonly businessId = input.required<string>();
 
-  // Regex requiring http:// or https:// followed by valid url format
+  // Permissive URL pattern allowing modern social media and Google Maps link formats (with uppercase, @, commas, etc.)
   urlRegex =
-    "^(https?:\\/\\/)?" + // protocol
-    "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
-    "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
-    "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
-    "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
-    "(\\#[-a-z\\d_]*)?$"; // fragment locator
+    "^(https?:\\/\\/)?([a-zA-Z\\d-]+\\.)+[a-zA-Z]{2,}(:\\d+)?(\\/.*)?$";
 
   private fb = inject(FormBuilder);
   private reviewLinksStore = inject(ReviewLinksStore);
 
-  linkForm = this.fb.nonNullable.group({
-    platform_name: ["", Validators.required],
-    platform_url: [
-      "",
-      [Validators.required, Validators.pattern(this.urlRegex)],
-    ],
+  readonly linkForm: FormGroup<ReviewLinkForm> = this.fb.group({
+    platform_name: this.fb.control("", {
+      validators: [Validators.required],
+      nonNullable: true,
+    }),
+    platform_url: this.fb.control("", {
+      validators: [Validators.required, Validators.pattern(this.urlRegex)],
+      nonNullable: true,
+    }),
   });
 
   reviewLinks = this.reviewLinksStore.links;
@@ -58,6 +67,10 @@ export class ReviewLinksComponent implements OnInit {
     { label: "Swiggy", value: "Swiggy" },
     { label: "Justdial", value: "Justdial" },
     { label: "Practo", value: "Practo" },
+    { label: "TripAdvisor", value: "TripAdvisor" },
+    { label: "Yelp", value: "Yelp" },
+    { label: "Trustpilot", value: "Trustpilot" },
+    { label: "Our Website (Custom)", value: "Custom" },
   ];
 
   constructor() {
@@ -76,6 +89,42 @@ export class ReviewLinksComponent implements OnInit {
 
   ngOnInit() {
     this.reviewLinksStore.loadLinks({ businessId: this.businessId() });
+
+    // Listen to platform_url changes to auto-select the platform
+    this.linkForm.controls.platform_url.valueChanges.subscribe((url) => {
+      if (!url) return;
+
+      const lowerUrl = url.toLowerCase();
+      const platformRules = [
+        {
+          name: "Google Business Profile",
+          patterns: ["google.com", "g.page", "google.co.in", "goo.gl"],
+        },
+        { name: "Facebook", patterns: ["facebook.com", "fb.me"] },
+        { name: "Instagram", patterns: ["instagram.com", "instagr.am"] },
+        { name: "Zomato", patterns: ["zomato.com"] },
+        { name: "Swiggy", patterns: ["swiggy.com"] },
+        { name: "Justdial", patterns: ["justdial.com"] },
+        { name: "Practo", patterns: ["practo.com"] },
+        {
+          name: "TripAdvisor",
+          patterns: ["tripadvisor.com", "tripadvisor.in"],
+        },
+        { name: "Yelp", patterns: ["yelp.com"] },
+        { name: "Trustpilot", patterns: ["trustpilot.com"] },
+      ];
+
+      const matched = platformRules.find((rule) =>
+        rule.patterns.some((pattern) => lowerUrl.includes(pattern)),
+      );
+
+      if (matched) {
+        const currentPlatform = this.linkForm.controls.platform_name.value;
+        if (!currentPlatform) {
+          this.linkForm.controls.platform_name.setValue(matched.name);
+        }
+      }
+    });
   }
 
   // Delegate to shared platform utilities

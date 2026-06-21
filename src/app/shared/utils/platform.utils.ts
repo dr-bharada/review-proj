@@ -66,3 +66,14 @@ export function getPlatformButtonClasses(platform: string): string {
   };
   return map[platform.toLowerCase()] || map["custom"];
 }
+
+export function getPlatformActionText(platform: string): string {
+  const name = platform.toLowerCase();
+  if (name === "instagram") {
+    return "Follow on Instagram";
+  }
+  if (name === "custom") {
+    return "Visit Our Website";
+  }
+  return `Review on ${getPlatformDisplayName(platform)}`;
+}

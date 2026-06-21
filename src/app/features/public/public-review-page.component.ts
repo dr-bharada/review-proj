@@ -10,6 +10,7 @@ import {
   getPlatformIcon,
   getPlatformButtonClasses,
   getPlatformDisplayName,
+  getPlatformActionText,
 } from "../../shared/utils";
 
 @Component({
@@ -27,6 +28,10 @@ export class PublicReviewPageComponent implements OnInit {
       const slug = params.get("slug");
       if (slug) {
         this.store.loadProfile({ slug });
+      } else {
+        console.warn(
+          "[PublicReviewPageComponent] No slug found in route parameters!",
+        );
       }
     });
   }
@@ -48,4 +53,5 @@ export class PublicReviewPageComponent implements OnInit {
   getPlatformDisplayName = getPlatformDisplayName;
   getPlatformIcon = getPlatformIcon;
   getPlatformButtonClasses = getPlatformButtonClasses;
+  getPlatformActionText = getPlatformActionText;
 }

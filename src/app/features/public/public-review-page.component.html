@@ -13,18 +13,30 @@
 
     @if (store.isLoading()) {
     <div class="flex-1 flex flex-col items-center justify-center p-12">
-      <p-progressSpinner styleClass="w-12 h-12"></p-progressSpinner>
+      <p-progressSpinner styleClass="w-12 h-12" />
       <p class="mt-4 text-slate-400 text-sm font-semibold">Loading profile...</p>
     </div>
     } @else if (store.error()) {
-    <div class="flex-1 flex flex-col items-center justify-center p-12 text-center">
-      <div
-        class="w-16 h-16 bg-red-950/30 text-red-400 rounded-full flex items-center justify-center mb-4 border border-red-900/30 shadow-lg shadow-red-950/20">
-        <i class="pi pi-exclamation-circle text-2xl"></i>
+    <div class="flex-1 flex flex-col items-center justify-center p-12 text-center space-y-6">
+      <div class="space-y-4">
+        <div
+          class="w-16 h-16 mx-auto bg-red-950/30 text-red-400 rounded-full flex items-center justify-center border border-red-900/30 shadow-lg shadow-red-950/20">
+          <i class="pi pi-exclamation-circle text-2xl"></i>
+        </div>
+        <h2 class="text-xl font-bold text-slate-100">Not Found</h2>
+        <p class="text-slate-400 text-sm max-w-xs leading-relaxed">
+          We couldn't find the review page for this business. The link may be incorrect or doesn't exist in the
+          database.
+        </p>
       </div>
-      <h2 class="text-xl font-bold text-slate-100 mb-2">Not Found</h2>
-      <p class="text-slate-400 text-sm">We couldn't find the review page for this business. The link may have expired or
-        is incorrect.</p>
+
+      <div class="w-full pt-4 border-t border-slate-800/50 space-y-3">
+        <p class="text-[11px] text-slate-500 font-semibold uppercase tracking-wider">Want to test the flow?</p>
+        <button (click)="store.loadProfile({ slug: 'mock' })"
+          class="w-full h-10 bg-slate-850 hover:bg-slate-800 text-slate-200 font-bold text-xs rounded-xl transition-all duration-200 border border-slate-700/60 active:scale-[0.98] cursor-pointer">
+          Launch Mock Demo Page
+        </button>
+      </div>
     </div>
     } @else if (store.profile()) {
     <!-- Header (Logo & Name) -->
@@ -101,7 +113,7 @@
             <i [class]="getPlatformIcon(link.platform_name) + ' text-xl'"></i>
           </div>
           <div class="text-left flex-1">
-            <span class="block font-bold text-base">Review on {{ getPlatformDisplayName(link.platform_name) }}</span>
+            <span class="block font-bold text-base">{{ getPlatformActionText(link.platform_name) }}</span>
           </div>
           <i
             class="pi pi-chevron-right opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300"></i>
