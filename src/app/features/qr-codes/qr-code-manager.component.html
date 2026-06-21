@@ -1,0 +1,152 @@
+<div class="space-y-6">
+
+  <!-- Section header -->
+  <div class="flex items-center gap-3">
+    <div
+      class="w-10 h-10 rounded-xl bg-fuchsia-900/50 border border-fuchsia-700/40 flex items-center justify-center flex-shrink-0">
+      <i class="pi pi-qrcode text-fuchsia-400"></i>
+    </div>
+    <div>
+      <h2 class="text-lg font-bold text-slate-100">QR Code</h2>
+      <p class="text-xs text-slate-500">Share your unique review link with customers</p>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  @if (isLoading()) {
+  <div class="flex items-center justify-center p-16 bg-slate-900/50 border border-slate-800/60 rounded-2xl">
+    <div class="flex flex-col items-center gap-3">
+      <div class="w-10 h-10 rounded-full border-2 border-fuchsia-500 border-t-transparent animate-spin"></div>
+      <p class="text-sm text-slate-400">Loading your QR code...</p>
+    </div>
+  </div>
+
+  } @else {
+
+  <!-- ── ACTIVE STATE (QR code exists) ── -->
+  @if (qrCode()) {
+  <div
+    class="relative overflow-hidden bg-slate-900/70 backdrop-blur-md border border-slate-800/80 rounded-2xl shadow-xl p-6 space-y-6">
+    <!-- ambient glow -->
+    <div class="absolute top-0 right-0 w-48 h-48 bg-fuchsia-500/5 rounded-full blur-2xl pointer-events-none"></div>
+
+    <!-- success badge -->
+    <div class="flex items-center gap-2">
+      <span
+        class="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-400 bg-emerald-950/50 border border-emerald-800/50 px-2.5 py-1 rounded-full">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        Active &amp; Live
+      </span>
+    </div>
+
+    <p class="text-slate-400 text-sm leading-relaxed">
+      Your review QR code is live. Print it, frame it, or share the link — customers scan it to leave reviews instantly.
+    </p>
+
+    <!-- QR code display -->
+    <div class="flex justify-center">
+      <div class="relative">
+        <div
+          class="absolute inset-0 rounded-2xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 blur-xl scale-110">
+        </div>
+        <div class="relative bg-white p-4 rounded-2xl shadow-2xl shadow-fuchsia-500/10 border border-slate-700/20">
+          <img [src]="qrImageUrl()" alt="Your Review QR Code" class="w-52 h-52 object-contain" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Public URL row -->
+    <div class="flex items-center gap-2">
+      <div
+        class="flex-1 flex items-center gap-3 bg-slate-950/80 border border-slate-800/80 rounded-xl px-4 py-3 min-w-0">
+        <i class="pi pi-link text-slate-500 text-sm flex-shrink-0"></i>
+        <span class="text-sm text-slate-300 font-mono truncate">{{ publicUrl() }}</span>
+      </div>
+      <button (click)="copyLink()"
+        [class]="copied()
+              ? 'flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-xl bg-emerald-900/50 border border-emerald-700/50 text-emerald-400 transition-all duration-200'
+              : 'flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-xl bg-slate-800/80 border border-slate-700/60 text-slate-400 hover:text-slate-200 hover:bg-slate-700/60 cursor-pointer transition-all duration-200 active:scale-95'"
+        title="Copy link">
+        <i [class]="copied() ? 'pi pi-check text-sm' : 'pi pi-copy text-sm'"></i>
+      </button>
+    </div>
+
+    <!-- Action buttons row -->
+    <div class="flex gap-3">
+      <!-- Preview / Test button -->
+      <a [href]="publicUrl()" target="_blank" rel="noopener noreferrer"
+        class="flex-1 h-12 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 hover:border-slate-600/80 text-slate-300 hover:text-white text-sm font-semibold rounded-xl cursor-pointer flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98] no-underline"
+        title="Open your public review page to verify it works">
+        <i class="pi pi-external-link text-sm"></i>
+        Preview Page
+      </a>
+
+      <!-- Download button -->
+      <button (click)="downloadQrCode()"
+        class="flex-1 h-12 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white text-sm font-semibold rounded-xl shadow-lg shadow-violet-500/20 cursor-pointer flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98]">
+        <i class="pi pi-download text-sm"></i>
+        Download QR
+      </button>
+    </div>
+  </div>
+
+  } @else {
+
+  <!-- ── CLAIM STATE (no QR code yet) ── -->
+  <div
+    class="relative overflow-hidden bg-slate-900/70 backdrop-blur-md border border-slate-800/80 rounded-2xl shadow-xl p-6 space-y-6">
+    <!-- ambient glow -->
+    <div class="absolute top-0 right-0 w-48 h-48 bg-violet-500/5 rounded-full blur-2xl pointer-events-none"></div>
+
+    <!-- Info banner -->
+    <div class="flex items-start gap-3 p-4 bg-violet-900/20 border border-violet-800/40 rounded-xl">
+      <i class="pi pi-info-circle text-violet-400 mt-0.5 flex-shrink-0"></i>
+      <p class="text-sm text-slate-300 leading-relaxed">
+        Claim your unique public URL. Choose a short, memorable slug — it can't be changed later.
+      </p>
+    </div>
+
+    <!-- Slug input -->
+    <div class="space-y-2">
+      <label for="slug" class="text-sm font-semibold text-slate-300">Choose your slug</label>
+
+      <div class="flex rounded-xl overflow-hidden border transition-all duration-200"
+        [class]="error()
+              ? 'border-rose-500/70'
+              : 'border-slate-700/60 focus-within:border-violet-500/70 focus-within:shadow-[0_0_0_3px_rgba(139,92,246,0.12)]'">
+        <!-- prefix -->
+        <div
+          class="flex items-center bg-slate-950 px-3 border-r border-slate-700/60 text-slate-500 font-mono text-xs whitespace-nowrap flex-shrink-0">
+          {{ siteUrl }}/r/
+        </div>
+        <!-- input -->
+        <input id="slug" type="text" [(ngModel)]="desiredSlug" placeholder="e.g. saffron-cafe"
+          [attr.aria-invalid]="error() ? 'true' : 'false'" (input)="error.set(null)" (keyup.enter)="claimSlug()"
+          class="flex-1 min-w-0 bg-slate-950 text-slate-100 placeholder-slate-600 px-4 py-3 text-sm focus:outline-none" />
+      </div>
+
+      @if (error()) {
+      <p class="text-xs text-rose-400 flex items-center gap-1.5 mt-1">
+        <i class="pi pi-exclamation-circle text-[11px]"></i>
+        {{ error() }}
+      </p>
+      } @else {
+      <p class="text-xs text-slate-500">Only lowercase letters, numbers, and hyphens.</p>
+      }
+    </div>
+
+    <!-- Submit button -->
+    <button (click)="claimSlug()" [disabled]="isSubmitting()"
+      class="w-full h-12 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl shadow-lg shadow-violet-500/20 cursor-pointer flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98]">
+      @if (isSubmitting()) {
+      <span class="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
+      Generating...
+      } @else {
+      <i class="pi pi-check text-sm"></i>
+      Claim &amp; Generate QR
+      }
+    </button>
+  </div>
+  }
+  }
+</div>

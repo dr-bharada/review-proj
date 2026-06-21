@@ -1,0 +1,101 @@
+import { Injectable } from "@angular/core";
+import {
+  createClient,
+  type SupabaseClient,
+  type PostgrestError,
+} from "@supabase/supabase-js";
+import { environment } from "../../../environments/environment";
+import { from, of, type Observable } from "rxjs";
+import { catchError, map } from "rxjs/operators";
+
+export interface AnalyticsEvent {
+  id?: string;
+  business_id: string;
+  platform_name: string; // matches DB column: analytics_events.platform_name
+  event_type: "click" | "scan";
+  created_at?: string;
+}
+
+export interface PlatformStat {
+  platform: string;
+  count: number;
+}
+
+@Injectable({
+  providedIn: "root",
+})
+export class AnalyticsService {
+  private readonly supabase: SupabaseClient;
+
+  constructor() {
+    this.supabase = createClient(
+      environment.supabaseUrl,
+      environment.supabaseKey,
+    );
+  }
+
+  logClick(
+    businessId: string,
+    platformName: string,
+  ): Observable<{ error: PostgrestError | Error | null }> {
+    return from(
+      this.supabase
+        .from("analytics_events")
+        .insert([
+          {
+            business_id: businessId,
+            platform_name: platformName,
+            event_type: "click",
+          },
+        ])
+    ).pipe(
+      map(({ error }) => ({ error })),
+      catchError((error: unknown) =>
+        of({
+          error: error instanceof Error ? error : new Error(String(error)),
+        })
+      )
+    );
+  }
+
+  getAnalyticsStats(
+    businessId: string,
+  ): Observable<{
+    data: PlatformStat[] | null;
+    error: PostgrestError | Error | null;
+  }> {
+    return from(
+      this.supabase
+        .from("analytics_events")
+        .select("platform_name") // ← correct column name
+        .eq("business_id", businessId)
+        .eq("event_type", "click") // only count link clicks, not scans
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) {
+          return { data: null, error };
+        }
+
+        // Aggregate by platform_name on the client
+        const counts: Record<string, number> = {};
+        data?.forEach((row) => {
+          const name = row["platform_name"] as string;
+          counts[name] = (counts[name] || 0) + 1;
+        });
+
+        const stats: PlatformStat[] = Object.entries(counts)
+          .map(([platform, count]) => ({ platform, count }))
+          .sort((a, b) => b.count - a.count);
+
+        return { data: stats, error: null };
+      }),
+      catchError((error: unknown) =>
+        of({
+          data: null,
+          error: error instanceof Error ? error : new Error(String(error)),
+        })
+      )
+    );
+  }
+}
+

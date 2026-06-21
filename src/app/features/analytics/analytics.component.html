@@ -1,0 +1,103 @@
+<div class="space-y-6">
+
+  <!-- Section header -->
+  <div class="flex items-center gap-3">
+    <div class="w-10 h-10 rounded-xl bg-emerald-900/50 border border-emerald-700/40 flex items-center justify-center flex-shrink-0">
+      <i class="pi pi-chart-bar text-emerald-400"></i>
+    </div>
+    <div>
+      <h2 class="text-lg font-bold text-slate-100">Analytics</h2>
+      <p class="text-xs text-slate-500">Track clicks across all your review platforms</p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading()) {
+    <div class="flex items-center justify-center p-16 bg-slate-900/50 border border-slate-800/60 rounded-2xl">
+      <div class="flex flex-col items-center gap-3">
+        <div class="w-10 h-10 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin"></div>
+        <p class="text-sm text-slate-400">Loading analytics...</p>
+      </div>
+    </div>
+
+  } @else if (stats().length === 0) {
+
+    <!-- Empty state -->
+    <div class="relative overflow-hidden flex flex-col items-center justify-center text-center p-14 bg-slate-900/50 border border-dashed border-slate-700/60 rounded-2xl space-y-3">
+      <div class="w-16 h-16 rounded-2xl bg-slate-800/80 border border-slate-700/60 flex items-center justify-center mb-2">
+        <i class="pi pi-chart-bar text-2xl text-slate-600"></i>
+      </div>
+      <h3 class="text-slate-300 font-semibold text-base">No clicks yet</h3>
+      <p class="text-sm text-slate-500 max-w-xs leading-relaxed">
+        Share your QR code or review links with customers — analytics will appear here once someone clicks.
+      </p>
+    </div>
+
+  } @else {
+
+    <!-- Summary strip -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <!-- Total clicks -->
+      <div class="relative overflow-hidden col-span-2 sm:col-span-1 p-4 bg-slate-900/70 border border-slate-800/80 rounded-2xl shadow-lg">
+        <div class="absolute top-0 right-0 w-20 h-20 bg-emerald-500/5 rounded-full blur-xl pointer-events-none"></div>
+        <p class="text-[11px] font-semibold text-slate-500 uppercase tracking-widest">Total Clicks</p>
+        <p class="text-3xl font-extrabold text-slate-100 mt-1">{{ totalClicks() }}</p>
+        <span class="inline-flex items-center gap-1 text-[10px] text-emerald-400 font-semibold mt-1">
+          <i class="pi pi-arrow-up text-[9px]"></i> All time
+        </span>
+      </div>
+
+      <!-- Top platform cards -->
+      @for (stat of stats().slice(0, 3); track stat.platform) {
+        <div class="relative overflow-hidden p-4 bg-slate-900/70 border border-slate-800/80 rounded-2xl shadow-lg">
+          <div class="flex items-center justify-between mb-2">
+            <p class="text-[11px] font-semibold text-slate-500 uppercase tracking-widest truncate">
+              {{ getDisplayName(stat.platform) }}
+            </p>
+            <div [class]="'w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ' + getIconBgClass(stat.platform)">
+              <i [class]="getIconClass(stat.platform) + ' text-xs'"></i>
+            </div>
+          </div>
+          <p class="text-2xl font-extrabold text-slate-100">{{ stat.count }}</p>
+          <p class="text-[10px] text-slate-500 mt-0.5">clicks</p>
+        </div>
+      }
+    </div>
+
+    <!-- Click distribution bar chart -->
+    <div class="relative overflow-hidden bg-slate-900/70 backdrop-blur-md border border-slate-800/80 rounded-2xl shadow-xl p-6 space-y-5">
+      <div class="absolute top-0 right-0 w-40 h-40 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none"></div>
+
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-bold text-slate-300 uppercase tracking-widest">Click Distribution</h3>
+        <span class="text-[11px] text-slate-500 font-medium">{{ stats().length }} platform{{ stats().length !== 1 ? 's' : '' }}</span>
+      </div>
+
+      <div class="space-y-4">
+        @for (stat of stats(); track stat.platform) {
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between text-xs font-medium">
+              <div class="flex items-center gap-2">
+                <div [class]="'w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 ' + getIconBgClass(stat.platform)">
+                  <i [class]="getIconClass(stat.platform) + ' text-[9px]'"></i>
+                </div>
+                <span class="text-slate-300">{{ getDisplayName(stat.platform) }}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-slate-400">{{ stat.count }} clicks</span>
+                <span class="text-slate-600 text-[10px]">{{ getPercentage(stat.count) }}%</span>
+              </div>
+            </div>
+            <div class="w-full bg-slate-800/80 rounded-full h-2.5 overflow-hidden">
+              <div
+                class="h-2.5 rounded-full transition-all duration-700 ease-out"
+                [class]="getBarClass(stat.platform)"
+                [style.width.%]="getPercentage(stat.count)"
+              ></div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

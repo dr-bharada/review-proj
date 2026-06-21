@@ -1,0 +1,168 @@
+<div class="relative overflow-hidden bg-slate-900/70 backdrop-blur-md border border-slate-800/80 rounded-2xl shadow-xl">
+
+  <!-- Top gradient accent line -->
+  <div
+    class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-amber-500 via-violet-500 to-fuchsia-500 rounded-t-2xl">
+  </div>
+
+  <!-- Panel header -->
+  <div class="flex items-center gap-3 px-6 pt-6 pb-5 border-b border-slate-800/60">
+    <div
+      class="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/25 flex items-center justify-center flex-shrink-0 shadow-sm">
+      <i class="pi pi-id-card text-amber-400"></i>
+    </div>
+    <div>
+      <h3 class="text-base font-bold text-slate-100 leading-tight">Business Profile</h3>
+      <p class="text-[11px] text-slate-500 leading-none mt-0.5">Manage your business information and branding.</p>
+    </div>
+  </div>
+
+  <div class="p-6 space-y-6">
+
+    <!-- Error banner -->
+    @if (errorMessage()) {
+    <div
+      class="flex items-center gap-3 px-4 py-3 bg-rose-950/40 border border-rose-800/50 rounded-xl text-sm text-rose-300">
+      <i class="pi pi-exclamation-triangle text-rose-400 flex-shrink-0"></i>
+      <span>{{ errorMessage() }}</span>
+    </div>
+    }
+
+    <!-- Success banner -->
+    @if (successMessage()) {
+    <div
+      class="flex items-center gap-3 px-4 py-3 bg-emerald-950/40 border border-emerald-800/50 rounded-xl text-sm text-emerald-300">
+      <i class="pi pi-check-circle text-emerald-400 flex-shrink-0"></i>
+      <span>Business profile saved successfully!</span>
+    </div>
+    }
+
+    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+      <!-- ===== LOGO UPLOAD SECTION ===== -->
+      <div
+        class="flex flex-col sm:flex-row items-center gap-5 p-5 bg-slate-950/50 border border-slate-800/60 rounded-2xl">
+        <!-- Avatar -->
+        <div class="relative group flex-shrink-0">
+          <div
+            class="w-24 h-24 rounded-2xl overflow-hidden bg-slate-800 border-2 border-slate-700/80 flex items-center justify-center shadow-lg">
+            @if (logoUrlPreview()) {
+            <img [src]="logoUrlPreview()!" alt="Logo Preview" class="w-full h-full object-cover" />
+            } @else {
+            <div
+              class="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900 gap-1">
+              <i class="pi pi-image text-2xl text-slate-600"></i>
+            </div>
+            }
+            @if (isUploading()) {
+            <div class="absolute inset-0 bg-black/70 rounded-2xl flex items-center justify-center">
+              <div class="w-6 h-6 rounded-full border-2 border-violet-400 border-t-transparent animate-spin"></div>
+            </div>
+            }
+          </div>
+          <!-- Upload hover overlay -->
+          <div
+            class="absolute inset-0 rounded-2xl bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
+            (click)="logoInput.click()">
+            <i class="pi pi-camera text-white text-lg"></i>
+          </div>
+        </div>
+
+        <!-- Upload info -->
+        <div class="flex-1 space-y-2 text-center sm:text-left">
+          <div>
+            <h4 class="text-sm font-bold text-slate-200">Business Logo</h4>
+            <p class="text-xs text-slate-500 mt-0.5">JPG or PNG, max 2MB. Appears on your review page and sidebar.</p>
+          </div>
+          <input type="file" accept="image/*" (change)="onLogoSelected($event)" class="hidden" #logoInput />
+          <button type="button" (click)="logoInput.click()" [disabled]="isUploading()"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-700/60 text-slate-300 hover:text-slate-100 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+            <i class="pi pi-upload text-[11px]"></i>
+            {{ isUploading() ? "Uploading..." : "Choose Image" }}
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== FORM FIELDS ===== -->
+      <div>
+        <p class="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-4">Business Details</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+          <!-- Business Name -->
+          <div class="flex flex-col gap-1.5">
+            <label for="business_name" class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Business
+              Name</label>
+            <input id="business_name" type="text" pInputText formControlName="business_name"
+              placeholder="e.g. Saffron Café"
+              [attr.aria-invalid]="profileForm.get('business_name')?.touched && profileForm.get('business_name')?.invalid ? 'true' : 'false'"
+              class="w-full bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-600 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 rounded-xl px-4 py-2.5 text-sm transition-all outline-none" />
+            @if (profileForm.get("business_name")?.touched && profileForm.get("business_name")?.invalid) {
+            <small class="text-xs text-rose-400 flex items-center gap-1">
+              <i class="pi pi-exclamation-circle text-[10px]"></i> Required
+            </small>
+            }
+          </div>
+
+          <!-- Category -->
+          <div class="flex flex-col gap-1.5">
+            <label for="category" class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Industry /
+              Category</label>
+            <p-dropdown id="category" formControlName="category" [options]="categories" optionLabel="label"
+              optionValue="value" placeholder="Select category" appendTo="body"
+              [attr.aria-invalid]="profileForm.get('category')?.touched && profileForm.get('category')?.invalid ? 'true' : 'false'"
+              styleClass="w-full bg-slate-950 border border-slate-800 text-slate-100 rounded-xl transition-colors"></p-dropdown>
+            @if (profileForm.get("category")?.touched && profileForm.get("category")?.invalid) {
+            <small class="text-xs text-rose-400 flex items-center gap-1">
+              <i class="pi pi-exclamation-circle text-[10px]"></i> Required
+            </small>
+            }
+          </div>
+
+          <!-- Phone Number -->
+          <div class="flex flex-col gap-1.5">
+            <label for="phone_number" class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Phone
+              Number</label>
+            <input id="phone_number" type="tel" pInputText formControlName="phone_number"
+              placeholder="e.g. +91 98765 43210"
+              [attr.aria-invalid]="profileForm.get('phone_number')?.touched && profileForm.get('phone_number')?.invalid ? 'true' : 'false'"
+              class="w-full bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-600 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 rounded-xl px-4 py-2.5 text-sm transition-all outline-none" />
+            @if (profileForm.get("phone_number")?.touched && profileForm.get("phone_number")?.invalid) {
+            <small class="text-xs text-rose-400 flex items-center gap-1">
+              <i class="pi pi-exclamation-circle text-[10px]"></i> Required
+            </small>
+            }
+          </div>
+
+          <!-- Address -->
+          <div class="flex flex-col gap-1.5">
+            <label for="address" class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Business
+              Address</label>
+            <input id="address" type="text" pInputText formControlName="address" placeholder="e.g. CG Road, Ahmedabad"
+              [attr.aria-invalid]="profileForm.get('address')?.touched && profileForm.get('address')?.invalid ? 'true' : 'false'"
+              class="w-full bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-600 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 rounded-xl px-4 py-2.5 text-sm transition-all outline-none" />
+            @if (profileForm.get("address")?.touched && profileForm.get("address")?.invalid) {
+            <small class="text-xs text-rose-400 flex items-center gap-1">
+              <i class="pi pi-exclamation-circle text-[10px]"></i> Required
+            </small>
+            }
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ===== SAVE BUTTON ===== -->
+      <div class="flex items-center justify-between pt-4 border-t border-slate-800/60">
+        <p class="text-xs text-slate-600">All fields are required.</p>
+        <button type="submit" [disabled]="isSaving() || isUploading()"
+          [className]="'flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white border-0 shadow-lg shadow-violet-500/20 transition-all active:scale-[0.97] ' + (isSaving() || isUploading() ? 'bg-slate-700 cursor-not-allowed opacity-60' : 'bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 cursor-pointer')">
+          @if (isSaving()) {
+          <i class="pi pi-spin pi-spinner text-xs"></i> Saving...
+          } @else {
+          <i class="pi pi-save text-xs"></i> Save Changes
+          }
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

@@ -1,0 +1,201 @@
+@import "tailwindcss";
+@import "primeicons/primeicons.css";
+
+/* Custom styles for application */
+@theme {
+  --color-primary-50: #f5f3ff;
+  --color-primary-100: #ede9fe;
+  --color-primary-500: #8b5cf6;
+  --color-primary-600: #7c3aed;
+  --color-primary-700: #6d28d9;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  background-color: #030712; /* Tailwind Slate 950 / Zinc 950 */
+  color: #f3f4f6;
+  overflow-x: hidden;
+}
+
+/* Fix PrimeNG Password component layout globally */
+.p-password {
+  display: flex !important;
+  width: 100%;
+}
+
+.p-password-toggle-mask-icon {
+  position: absolute !important;
+  right: 1rem !important;
+  left: auto !important;
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* Custom Input Styling overrides */
+.p-inputtext,
+.p-password input {
+  border: 1px solid #334155 !important; /* slate-700 */
+  background-color: #020617 !important; /* slate-950 */
+  color: #f8fafc !important; /* slate-50 */
+  border-radius: 0.75rem !important; /* rounded-xl */
+  height: 50px !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.p-inputtext:focus,
+.p-password input:focus {
+  border-color: #8b5cf6 !important; /* violet-500 */
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2) !important;
+  outline: none !important;
+}
+
+/* Error State styling (rose-500) */
+.p-inputtext.ng-touched.ng-invalid,
+.p-inputtext.ng-dirty.ng-invalid,
+.p-password.ng-touched.ng-invalid input,
+.p-password.ng-dirty.ng-invalid input,
+.p-dropdown.ng-touched.ng-invalid,
+.p-dropdown.ng-dirty.ng-invalid,
+.p-select.ng-touched.ng-invalid,
+.p-select.ng-dirty.ng-invalid {
+  border-color: #f43f5e !important; /* rose-500 */
+  box-shadow: 0 0 0 2px rgba(244, 63, 94, 0.2) !important;
+}
+
+/* Success State styling (emerald-500) */
+.p-inputtext.ng-dirty.ng-valid,
+.p-password.ng-dirty.ng-valid input,
+.p-dropdown.ng-dirty.ng-valid,
+.p-select.ng-dirty.ng-valid {
+  border-color: #10b981 !important; /* emerald-500 */
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2) !important;
+}
+
+/* Ensure padding-right is larger for password input to prevent eye icon overlap */
+.p-password input {
+  padding-right: 3rem !important;
+}
+
+/* --- PrimeNG Dropdown / Select Custom Styling (for unstyled mode) --- */
+.p-dropdown,
+.p-select {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  position: relative !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  border: 1px solid #334155 !important; /* slate-700 */
+  background-color: #020617 !important; /* slate-950 */
+  color: #f8fafc !important; /* slate-50 */
+  border-radius: 0.75rem !important; /* rounded-xl */
+  height: 50px !important;
+  padding: 0 1rem !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.p-dropdown:hover,
+.p-select:hover {
+  border-color: #475569 !important; /* slate-600 */
+}
+
+.p-dropdown:focus-within,
+.p-select:focus-within {
+  border-color: #8b5cf6 !important; /* violet-500 */
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2) !important;
+}
+
+/* Label text styles */
+.p-dropdown-label,
+.p-select-label {
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  color: #f8fafc !important;
+  font-size: 0.875rem !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  flex: 1 1 auto !important;
+}
+
+.p-dropdown-label.p-placeholder,
+.p-select-label.p-placeholder {
+  color: #64748b !important; /* slate-500 placeholder color */
+}
+
+/* Trigger / arrow button icon */
+.p-dropdown-trigger,
+.p-select-trigger {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #94a3b8 !important; /* slate-400 */
+  flex-shrink: 0 !important;
+}
+
+/* Overlay Panel / dropdown options wrapper */
+.p-dropdown-panel,
+.p-select-overlay,
+.p-select-panel {
+  position: absolute !important;
+  background-color: #090d16 !important; /* dark slate background */
+  border: 1px solid #334155 !important; /* slate-700 border */
+  border-radius: 0.75rem !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.5) !important;
+  margin-top: 4px !important;
+  z-index: 99999 !important;
+  overflow: hidden !important;
+  min-width: 100% !important;
+}
+
+/* Items Wrapper */
+.p-dropdown-items-wrapper,
+.p-select-list-wrapper {
+  max-height: 200px !important;
+  overflow-y: auto !important;
+}
+
+/* List container */
+.p-dropdown-items,
+.p-select-list {
+  padding: 0.375rem !important;
+  margin: 0 !important;
+  list-style-type: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.25rem !important;
+}
+
+/* Individual list item */
+.p-dropdown-item,
+.p-select-option,
+.p-select-item {
+  margin: 0 !important;
+  padding: 0.625rem 0.875rem !important;
+  border: 0 !important;
+  border-radius: 0.5rem !important;
+  color: #cbd5e1 !important; /* slate-300 */
+  background: transparent !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.p-dropdown-item:hover,
+.p-select-option:hover,
+.p-select-item:hover {
+  background-color: #1e293b !important; /* slate-800 hover background */
+  color: #f8fafc !important; /* slate-50 */
+}
+
+.p-dropdown-item.p-highlight,
+.p-select-option.p-highlight,
+.p-select-item.p-highlight {
+  background-color: #4c1d95 !important; /* violet-900 */
+  color: #ddd6fe !important; /* violet-200 */
+}
