@@ -91,4 +91,23 @@ export class PublicService {
       }),
     );
   }
+
+  submitFeedback(
+    businessId: string,
+    rating: number,
+    feedbackText: string,
+  ): Observable<{ error: PostgrestError | Error | null }> {
+    return from(
+      this.supabase.from("private_feedbacks").insert({
+        business_id: businessId,
+        rating,
+        feedback_text: feedbackText,
+      }),
+    ).pipe(
+      map(({ error }) => ({ error })),
+      catchError((err: unknown) =>
+        of({ error: err instanceof Error ? err : new Error(String(err)) }),
+      ),
+    );
+  }
 }

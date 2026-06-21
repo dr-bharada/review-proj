@@ -1,78 +1,185 @@
-<div class="min-h-screen bg-slate-950 flex flex-col items-center justify-center py-12 px-4 sm:px-6 relative overflow-hidden">
+<div
+  class="min-h-screen bg-slate-950 flex flex-col items-center justify-center py-12 px-4 sm:px-6 relative overflow-hidden">
   <!-- Ambient Background Glows -->
-  <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-violet-600/10 blur-[120px] pointer-events-none"></div>
-  <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-fuchsia-600/10 blur-[120px] pointer-events-none"></div>
+  <div
+    class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-violet-600/10 blur-[120px] pointer-events-none">
+  </div>
+  <div
+    class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-fuchsia-600/10 blur-[120px] pointer-events-none">
+  </div>
 
-  <div class="w-full max-w-md bg-slate-900/65 backdrop-blur-2xl rounded-3xl overflow-hidden border border-slate-800/80 flex flex-col h-full min-h-[600px] shadow-2xl shadow-slate-950/50 z-10 relative">
-    
-    @if (isLoading()) {
-      <div class="flex-1 flex flex-col items-center justify-center p-12">
-        <p-progressSpinner styleClass="w-12 h-12"></p-progressSpinner>
-        <p class="mt-4 text-slate-400 text-sm font-semibold">Loading profile...</p>
+  <div
+    class="w-full max-w-md bg-slate-900/65 backdrop-blur-2xl rounded-3xl overflow-hidden border border-slate-800/80 flex flex-col h-full min-h-[600px] shadow-2xl shadow-slate-950/50 z-10 relative">
+
+    @if (store.isLoading()) {
+    <div class="flex-1 flex flex-col items-center justify-center p-12">
+      <p-progressSpinner styleClass="w-12 h-12"></p-progressSpinner>
+      <p class="mt-4 text-slate-400 text-sm font-semibold">Loading profile...</p>
+    </div>
+    } @else if (store.error()) {
+    <div class="flex-1 flex flex-col items-center justify-center p-12 text-center">
+      <div
+        class="w-16 h-16 bg-red-950/30 text-red-400 rounded-full flex items-center justify-center mb-4 border border-red-900/30 shadow-lg shadow-red-950/20">
+        <i class="pi pi-exclamation-circle text-2xl"></i>
       </div>
-    } @else if (error()) {
-      <div class="flex-1 flex flex-col items-center justify-center p-12 text-center">
-        <div class="w-16 h-16 bg-red-950/30 text-red-400 rounded-full flex items-center justify-center mb-4 border border-red-900/30 shadow-lg shadow-red-950/20">
-          <i class="pi pi-exclamation-circle text-2xl"></i>
+      <h2 class="text-xl font-bold text-slate-100 mb-2">Not Found</h2>
+      <p class="text-slate-400 text-sm">We couldn't find the review page for this business. The link may have expired or
+        is incorrect.</p>
+    </div>
+    } @else if (store.profile()) {
+    <!-- Header (Logo & Name) -->
+    <div class="pt-12 pb-6 px-6 text-center space-y-4">
+      <div
+        class="w-24 h-24 mx-auto rounded-full shadow-xl overflow-hidden bg-slate-950/80 border border-slate-800 p-1 flex flex-col justify-center items-center relative group">
+        <div
+          class="absolute inset-0 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 opacity-20 group-hover:opacity-40 transition-opacity duration-300">
         </div>
-        <h2 class="text-xl font-bold text-slate-100 mb-2">Not Found</h2>
-        <p class="text-slate-400 text-sm">We couldn't find the review page for this business. The link may have expired or is incorrect.</p>
-      </div>
-    } @else if (profile()) {
-      <!-- Header (Logo & Name) -->
-      <div class="pt-12 pb-6 px-6 text-center space-y-4">
-        <div class="w-24 h-24 mx-auto rounded-full shadow-xl overflow-hidden bg-slate-950/80 border border-slate-800 p-1 flex flex-col justify-center items-center relative group">
-          <div class="absolute inset-0 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
-          @if (profile()!.business.logo_url) {
-            <img [src]="profile()!.business.logo_url" [alt]="profile()!.business.business_name" class="w-full h-full object-cover rounded-full relative z-10" />
-          } @else {
-            <div class="w-full h-full rounded-full bg-slate-900 flex items-center justify-center relative z-10">
-              <i class="pi pi-image text-3xl text-slate-500"></i>
-            </div>
-          }
+        @if (store.profile()!.business.logo_url) {
+        <img [src]="store.profile()!.business.logo_url" [alt]="store.profile()!.business.business_name"
+          class="w-full h-full object-cover rounded-full relative z-10" />
+        } @else {
+        <div class="w-full h-full rounded-full bg-slate-900 flex items-center justify-center relative z-10">
+          <i class="pi pi-image text-3xl text-slate-500"></i>
         </div>
-        
-        <div class="space-y-1">
-          <h1 class="text-2xl font-extrabold text-slate-100 tracking-tight bg-gradient-to-r from-slate-100 via-slate-200 to-slate-400 bg-clip-text">{{ profile()!.business.business_name }}</h1>
-          <p class="text-xs font-bold uppercase tracking-widest text-violet-400">{{ profile()!.business.category }}</p>
-        </div>
+        }
       </div>
 
-      <!-- Body (Review Links) -->
-      <div class="flex-1 px-6 pb-8 space-y-5">
-        <p class="text-center text-slate-300 text-sm font-medium leading-relaxed">
-          How was your experience? Leave us a review on your favorite platform!
+      <div class="space-y-1">
+        <h1
+          class="text-2xl font-extrabold text-slate-100 tracking-tight bg-gradient-to-r from-slate-100 via-slate-200 to-slate-400 bg-clip-text">
+          {{ store.profile()!.business.business_name }}</h1>
+        <p class="text-xs font-bold uppercase tracking-widest text-violet-400">{{ store.profile()!.business.category }}
         </p>
+      </div>
+    </div>
 
-        <div class="flex flex-col gap-3">
-          @for (link of profile()!.links; track link.id) {
-            <button 
-              [class]="getPlatformButtonClasses(link.platform_name) + ' w-full flex items-center p-4 rounded-2xl border transition-all duration-300 active:scale-98 group cursor-pointer hover:scale-[1.02] hover:-translate-y-0.5'"
-              (click)="onLinkClick(link)"
-            >
-              <div class="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300">
-                <i [class]="getPlatformIcon(link.platform_name) + ' text-xl'"></i>
-              </div>
-              <div class="text-left flex-1">
-                <span class="block font-bold text-base">Review on {{ getPlatformDisplayName(link.platform_name) }}</span>
-              </div>
-              <i class="pi pi-chevron-right opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300"></i>
-            </button>
-          }
-          
-          @if (profile()!.links.length === 0) {
-            <div class="text-center p-8 bg-slate-950/40 rounded-2xl border border-slate-800/80 space-y-2">
-              <i class="pi pi-link text-2xl text-slate-600"></i>
-              <p class="text-slate-400 text-sm">No review links available at the moment.</p>
-            </div>
-          }
+    <!-- STEP 1: RATING SELECTOR (Default State) -->
+    @if (store.ratingSelected() === null) {
+    <div class="flex-1 px-6 pb-8 flex flex-col justify-center items-center space-y-6 text-center">
+      <p class="text-slate-300 text-sm font-medium leading-relaxed max-w-xs">
+        How was your experience with us? Please rate us below:
+      </p>
+
+      <div class="flex items-center gap-2">
+        @for (star of [1, 2, 3, 4, 5]; track star) {
+        <button
+          class="w-12 h-12 flex items-center justify-center rounded-xl bg-slate-950/50 border border-slate-800/80 hover:border-violet-500/50 hover:bg-slate-900/40 text-2xl cursor-pointer transition-all duration-150 transform hover:scale-110 active:scale-95"
+          (click)="store.selectRating(star)" (mouseenter)="store.setHoveredRating(star)"
+          (mouseleave)="store.setHoveredRating(null)">
+          <i
+            [class]="'pi text-2xl transition-colors duration-150 ' + 
+                  ((store.hoveredRating() !== null ? star <= store.hoveredRating()! : star <= (store.ratingSelected() || 0)) ? 'pi-star-fill text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.3)]' : 'pi-star text-slate-600')"></i>
+        </button>
+        }
+      </div>
+      <span class="text-[10px] text-slate-500 uppercase font-semibold tracking-wider animate-pulse">Tap a star to
+        start</span>
+    </div>
+    }
+
+    <!-- STEP 2: POSITIVE ROUTE (Rating 4-5) -> Show social links -->
+    @else if (store.ratingSelected()! >= 4) {
+    <div class="px-6 mb-2">
+      <button (click)="store.resetFeedbackFlow()"
+        class="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 hover:text-slate-350 transition-colors border-0 bg-transparent cursor-pointer">
+        <i class="pi pi-arrow-left text-[8px]"></i> Back / Change Rating
+      </button>
+    </div>
+
+    <div class="flex-1 px-6 pb-8 space-y-5">
+      <p class="text-center text-slate-300 text-sm font-medium leading-relaxed">
+        We are thrilled you had a great experience! Choose a platform below to leave your review:
+      </p>
+
+      <div class="flex flex-col gap-3">
+        @for (link of store.profile()!.links; track link.id) {
+        <button
+          [class]="getPlatformButtonClasses(link.platform_name) + ' w-full flex items-center p-4 rounded-2xl border transition-all duration-300 active:scale-98 group cursor-pointer hover:scale-[1.02] hover:-translate-y-0.5'"
+          (click)="onLinkClick(link)">
+          <div
+            class="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300">
+            <i [class]="getPlatformIcon(link.platform_name) + ' text-xl'"></i>
+          </div>
+          <div class="text-left flex-1">
+            <span class="block font-bold text-base">Review on {{ getPlatformDisplayName(link.platform_name) }}</span>
+          </div>
+          <i
+            class="pi pi-chevron-right opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300"></i>
+        </button>
+        }
+
+        @if (store.profile()!.links.length === 0) {
+        <div class="text-center p-8 bg-slate-950/40 rounded-2xl border border-slate-800/80 space-y-2">
+          <i class="pi pi-link text-2xl text-slate-600"></i>
+          <p class="text-slate-400 text-sm">No review links available at the moment.</p>
         </div>
+        }
       </div>
-      
-      <!-- Footer -->
-      <div class="py-6 text-center border-t border-slate-800/60 mt-auto bg-slate-950/20">
-        <p class="text-[10px] text-slate-500 font-semibold uppercase tracking-widest">Powered by Review Platform</p>
+    </div>
+    }
+
+    <!-- STEP 2: NEGATIVE ROUTE (Rating 1-3) -> Private feedback form -->
+    @else {
+    <div class="px-6 mb-2 flex justify-between items-center">
+      <button (click)="store.resetFeedbackFlow()"
+        class="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 hover:text-slate-350 transition-colors border-0 bg-transparent cursor-pointer">
+        <i class="pi pi-arrow-left text-[8px]"></i> Back / Change Rating
+      </button>
+      <span
+        class="text-[10px] text-amber-500 font-bold bg-amber-950/60 border border-amber-900/30 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+        <i class="pi pi-star-fill text-[8px]"></i> {{ store.ratingSelected() }} Star Rating
+      </span>
+    </div>
+
+    <div class="flex-1 px-6 pb-8 flex flex-col justify-center">
+      @if (!store.feedbackSubmitted()) {
+      <div class="space-y-4">
+        <div class="text-center space-y-1.5">
+          <h3 class="text-base font-bold text-slate-100">How can we make it better?</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">Your feedback will be sent privately to management so we can
+            resolve any issues directly.</p>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <textarea [ngModel]="store.feedbackText()" (ngModelChange)="store.setFeedbackText($event)" rows="4"
+            placeholder="Tell us what went wrong, and how we can improve..."
+            class="w-full bg-slate-950 text-slate-100 placeholder-slate-650 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-none rounded-2xl p-4 transition-all duration-200 border border-slate-800 text-xs resize-none"></textarea>
+        </div>
+
+        <button (click)="store.submitFeedback()"
+          [disabled]="store.isSubmittingFeedback() || !store.feedbackText().trim()"
+          class="w-full h-[46px] bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-bold text-xs rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-violet-500/10 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer border-0">
+          @if (store.isSubmittingFeedback()) {
+          <i class="pi pi-spin pi-spinner text-sm"></i> Submitting...
+          } @else {
+          Send Private Feedback
+          }
+        </button>
       </div>
+      } @else {
+      <div class="text-center py-6 px-4 space-y-4 flex flex-col items-center">
+        <div
+          class="w-12 h-12 rounded-full bg-emerald-950/60 border border-emerald-900/30 flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-950/20">
+          <i class="pi pi-check text-lg"></i>
+        </div>
+        <div class="space-y-1.5">
+          <h3 class="text-base font-bold text-slate-100">Thank You!</h3>
+          <p class="text-xs text-slate-450 leading-relaxed font-normal">Your feedback has been sent directly to the
+            store owners. We appreciate your honesty and will use it to make improvements.</p>
+        </div>
+        <button (click)="store.resetFeedbackFlow()"
+          class="px-4 py-2 bg-slate-850 hover:bg-slate-800 text-slate-200 font-semibold text-xs rounded-xl transition-colors border border-slate-700/60 cursor-pointer">
+          Close / Rate Again
+        </button>
+      </div>
+      }
+    </div>
+    }
+
+    <!-- Footer -->
+    <div class="py-6 text-center border-t border-slate-800/60 mt-auto bg-slate-950/20">
+      <p class="text-[10px] text-slate-500 font-semibold uppercase tracking-widest">Powered by Review Platform</p>
+    </div>
     }
   </div>
 </div>
