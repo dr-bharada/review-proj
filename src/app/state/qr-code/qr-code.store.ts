@@ -1,5 +1,4 @@
-import { Injectable, inject, signal, computed } from "@angular/core";
-import { Subject, takeUntil, switchMap, tap, catchError, EMPTY } from "rxjs";
+import { Injectable, inject, signal, computed, effect } from "@angular/core";
 import type { QrCode } from "../../core/models/qr-code.model";
 import { QrCodeService } from "../../features/qr-codes/qr-code.service";
 import { environment } from "../../../environments/environment";
@@ -26,10 +25,10 @@ export class QrCodeStore {
   readonly state = signal<QrCodeState>(initialState);
 
   // ── Derived selectors ─────────────────────────────────────────────────
-  readonly qrCode    = computed(() => this.state().qrCode);
-  readonly isLoading = computed(() => this.state().isLoading);
+  readonly qrCode     = computed(() => this.state().qrCode);
+  readonly isLoading  = computed(() => this.state().isLoading);
   readonly isClaiming = computed(() => this.state().isClaiming);
-  readonly error     = computed(() => this.state().error);
+  readonly error      = computed(() => this.state().error);
 
   readonly qrImageUrl = computed(() => {
     const code = this.state().qrCode;
@@ -48,74 +47,60 @@ export class QrCodeStore {
     return slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   });
 
-  // ── RxJS triggers ─────────────────────────────────────────────────────
-  private readonly load$    = new Subject<string>();
-  private readonly claim$   = new Subject<{ businessId: string; slug: string }>();
-  private readonly destroy$ = new Subject<void>();
+  // ── Trigger signals ───────────────────────────────────────────────────
+  private readonly loadTrigger  = signal<string | null>(null);
+  private readonly claimTrigger = signal<{ businessId: string; slug: string } | null>(null);
 
   constructor() {
-    // Load QR code
-    this.load$
-      .pipe(
-        tap(() => this.state.update((s) => ({ ...s, isLoading: true, error: null }))),
-        switchMap((businessId) =>
-          this.qrCodeService.getQrCode(businessId).pipe(
-            tap((qrCode) =>
-              this.state.update((s) => ({ ...s, qrCode, isLoading: false })),
-            ),
-            catchError((err: unknown) => {
-              this.state.update((s) => ({
-                ...s,
-                isLoading: false,
-                error: err instanceof Error ? err.message : "Failed to load QR code",
-              }));
-              return EMPTY;
-            }),
-          ),
-        ),
-        takeUntil(this.destroy$),
-      )
-      .subscribe();
+    // Effect: fires when loadTrigger changes
+    effect(() => {
+      const businessId = this.loadTrigger();
+      if (!businessId) return;
 
-    // Claim slug
-    this.claim$
-      .pipe(
-        tap(() => this.state.update((s) => ({ ...s, isClaiming: true, error: null }))),
-        switchMap(({ businessId, slug }) =>
-          this.qrCodeService.claimSlug(businessId, slug).pipe(
-            tap((qrCode) =>
-              this.state.update((s) => ({ ...s, qrCode, isClaiming: false })),
-            ),
-            catchError((err: unknown) => {
-              this.state.update((s) => ({
-                ...s,
-                isClaiming: false,
-                error: err instanceof Error ? err.message : "Failed to claim slug",
-              }));
-              return EMPTY;
-            }),
-          ),
-        ),
-        takeUntil(this.destroy$),
-      )
-      .subscribe();
+      this.state.update((s) => ({ ...s, isLoading: true, error: null }));
+
+      this.qrCodeService.getQrCode(businessId).subscribe({
+        next: (qrCode) =>
+          this.state.update((s) => ({ ...s, qrCode, isLoading: false })),
+        error: (err: unknown) =>
+          this.state.update((s) => ({
+            ...s,
+            isLoading: false,
+            error: err instanceof Error ? err.message : "Failed to load QR code",
+          })),
+      });
+    });
+
+    // Effect: fires when claimTrigger changes
+    effect(() => {
+      const payload = this.claimTrigger();
+      if (!payload) return;
+
+      this.state.update((s) => ({ ...s, isClaiming: true, error: null }));
+
+      this.qrCodeService.claimSlug(payload.businessId, payload.slug).subscribe({
+        next: (qrCode) =>
+          this.state.update((s) => ({ ...s, qrCode, isClaiming: false })),
+        error: (err: unknown) =>
+          this.state.update((s) => ({
+            ...s,
+            isClaiming: false,
+            error: err instanceof Error ? err.message : "Failed to claim slug",
+          })),
+      });
+    });
   }
 
   // ── Public methods ────────────────────────────────────────────────────
   loadQrCode(businessId: string): void {
-    this.load$.next(businessId);
+    this.loadTrigger.set(businessId);
   }
 
   claimSlug(businessId: string, slug: string): void {
-    this.claim$.next({ businessId, slug });
+    this.claimTrigger.set({ businessId, slug });
   }
 
   reset(): void {
     this.state.set(initialState);
-  }
-
-  destroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }
