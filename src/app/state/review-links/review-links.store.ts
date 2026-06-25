@@ -1,8 +1,8 @@
-import { signalStore, withState, withMethods, patchState } from "@ngrx/signals";
-import { inject } from "@angular/core";
+import { Injectable, inject, signal, computed } from "@angular/core";
+import { tapResponse } from "@ngrx/operators";
 import { rxMethod } from "@ngrx/signals/rxjs-interop";
-import { pipe, from } from "rxjs";
-import { tap, mergeMap, catchError } from "rxjs/operators";
+import { pipe } from "rxjs";
+import { switchMap, mergeMap } from "rxjs/operators";
 import type { ReviewLink } from "../../core/models/review-link.model";
 import { ReviewLinksService } from "../../features/review-links/review-links.service";
 
@@ -20,149 +20,183 @@ const initialState: ReviewLinksState = {
   error: null,
 };
 
-export const ReviewLinksStore = signalStore(
-  { providedIn: "root" },
-  withState(initialState),
-  withMethods((store, reviewLinksService = inject(ReviewLinksService)) => ({
-    loadLinks: rxMethod<{ businessId: string }>(
-      pipe(
-        tap(() => patchState(store, { isLoading: true, error: null })),
-        mergeMap(({ businessId }) =>
-          reviewLinksService.getReviewLinks(businessId).pipe(
-            tap(({ data, error }) => {
+@Injectable({ providedIn: "root" })
+export class ReviewLinksStore {
+  private readonly reviewLinksService = inject(ReviewLinksService);
+
+  // ── Single state signal ───────────────────────────────────────────────
+  readonly state = signal<ReviewLinksState>(initialState);
+
+  // ── Derived selectors ─────────────────────────────────────────────────
+  readonly links = computed(() => this.state().links);
+  readonly isLoading = computed(() => this.state().isLoading);
+  readonly isSaving = computed(() => this.state().isSaving);
+  readonly error = computed(() => this.state().error);
+
+  // ── Public methods ────────────────────────────────────────────────────
+  readonly loadLinks = rxMethod<{ businessId: string }>(
+    pipe(
+      switchMap((params) => {
+        this.state.update((s) => ({ ...s, isLoading: true, error: null }));
+        return this.reviewLinksService.getReviewLinks(params.businessId).pipe(
+          tapResponse({
+            next: ({ data, error }) => {
               if (error) {
-                patchState(store, {
-                  isLoading: false,
+                this.state.update((s) => ({
+                  ...s,
                   error: error.message || "Failed to load review links",
-                });
+                }));
               } else {
-                patchState(store, {
+                this.state.update((s) => ({
+                  ...s,
                   links: data || [],
-                  isLoading: false,
-                  error: null,
-                });
+                }));
               }
-            }),
-            catchError((err: unknown) => {
-              const errorMessage =
-                err instanceof Error
-                  ? err.message
-                  : "Failed to load review links";
-              patchState(store, { isLoading: false, error: errorMessage });
-              return from([]);
-            }),
-          ),
-        ),
-      ),
-    ),
+            },
+            error: (err: unknown) => {
+              this.state.update((s) => ({
+                ...s,
+                error:
+                  err instanceof Error
+                    ? err.message
+                    : "Failed to load review links",
+              }));
+            },
+            finalize: () => {
+              this.state.update((s) => ({ ...s, isLoading: false }));
+            },
+          })
+        );
+      })
+    )
+  );
 
-    addLink: rxMethod<{ link: ReviewLink }>(
-      pipe(
-        tap(() => patchState(store, { isSaving: true, error: null })),
-        mergeMap(({ link }) =>
-          reviewLinksService.addReviewLink(link).pipe(
-            tap(({ data, error }) => {
+  readonly addLink = rxMethod<{ link: ReviewLink; onSuccess?: () => void }>(
+    pipe(
+      mergeMap((params) => {
+        this.state.update((s) => ({ ...s, isSaving: true, error: null }));
+        return this.reviewLinksService.addReviewLink(params.link).pipe(
+          tapResponse({
+            next: ({ data, error }) => {
               if (error) {
-                patchState(store, {
-                  isSaving: false,
+                this.state.update((s) => ({
+                  ...s,
                   error: error.message || "Failed to add review link",
-                });
+                }));
               } else if (data) {
-                const currentLinks = store.links();
-                patchState(store, {
-                  links: [...currentLinks, data],
-                  isSaving: false,
-                  error: null,
-                });
+                this.state.update((s) => ({
+                  ...s,
+                  links: [...s.links, data],
+                }));
+                if (params.onSuccess) params.onSuccess();
               } else {
-                patchState(store, {
-                  isSaving: false,
+                this.state.update((s) => ({
+                  ...s,
                   error: "Failed to retrieve added link",
-                });
+                }));
               }
-            }),
-            catchError((err: unknown) => {
-              const errorMessage =
-                err instanceof Error
-                  ? err.message
-                  : "Failed to add review link";
-              patchState(store, { isSaving: false, error: errorMessage });
-              return from([]);
-            }),
-          ),
-        ),
-      ),
-    ),
+            },
+            error: (err: unknown) => {
+              this.state.update((s) => ({
+                ...s,
+                error:
+                  err instanceof Error
+                    ? err.message
+                    : "Failed to add review link",
+              }));
+            },
+            finalize: () => {
+              this.state.update((s) => ({ ...s, isSaving: false }));
+            },
+          })
+        );
+      })
+    )
+  );
 
-    updateLink: rxMethod<{ id: string; updates: Partial<ReviewLink> }>(
-      pipe(
-        tap(() => patchState(store, { isSaving: true, error: null })),
-        mergeMap(({ id, updates }) =>
-          reviewLinksService.updateReviewLink(id, updates).pipe(
-            tap(({ data, error }) => {
-              if (error) {
-                patchState(store, {
-                  isSaving: false,
-                  error: error.message || "Failed to update review link",
-                });
-              } else if (data) {
-                const currentLinks = store.links();
-                patchState(store, {
-                  links: currentLinks.map((l) => (l.id === data.id ? data : l)),
-                  isSaving: false,
-                  error: null,
-                });
-              } else {
-                patchState(store, {
-                  isSaving: false,
-                  error: "Failed to retrieve updated link",
-                });
-              }
-            }),
-            catchError((err: unknown) => {
-              const errorMessage =
-                err instanceof Error
-                  ? err.message
-                  : "Failed to update review link";
-              patchState(store, { isSaving: false, error: errorMessage });
-              return from([]);
-            }),
-          ),
-        ),
-      ),
-    ),
+  readonly updateLink = rxMethod<{
+    id: string;
+    updates: Partial<ReviewLink>;
+    onSuccess?: () => void;
+  }>(
+    pipe(
+      mergeMap((params) => {
+        this.state.update((s) => ({ ...s, isSaving: true, error: null }));
+        return this.reviewLinksService
+          .updateReviewLink(params.id, params.updates)
+          .pipe(
+            tapResponse({
+              next: ({ data, error }) => {
+                if (error) {
+                  this.state.update((s) => ({
+                    ...s,
+                    error: error.message || "Failed to update review link",
+                  }));
+                } else if (data) {
+                  this.state.update((s) => ({
+                    ...s,
+                    links: s.links.map((l) => (l.id === data.id ? data : l)),
+                  }));
+                  if (params.onSuccess) params.onSuccess();
+                } else {
+                  this.state.update((s) => ({
+                    ...s,
+                    error: "Failed to retrieve updated link",
+                  }));
+                }
+              },
+              error: (err: unknown) => {
+                this.state.update((s) => ({
+                  ...s,
+                  error:
+                    err instanceof Error
+                      ? err.message
+                      : "Failed to update review link",
+                }));
+              },
+              finalize: () => {
+                this.state.update((s) => ({ ...s, isSaving: false }));
+              },
+            })
+          );
+      })
+    )
+  );
 
-    deleteLink: rxMethod<{ id: string }>(
-      pipe(
-        tap(() => patchState(store, { isSaving: true, error: null })),
-        mergeMap(({ id }) =>
-          reviewLinksService.deleteReviewLink(id).pipe(
-            tap(({ error }) => {
+  readonly deleteLink = rxMethod<{ id: string }>(
+    pipe(
+      mergeMap((params) => {
+        this.state.update((s) => ({ ...s, isSaving: true, error: null }));
+        return this.reviewLinksService.deleteReviewLink(params.id).pipe(
+          tapResponse({
+            next: ({ error }) => {
               if (error) {
-                patchState(store, {
-                  isSaving: false,
+                this.state.update((s) => ({
+                  ...s,
                   error: error.message || "Failed to delete review link",
-                });
+                }));
               } else {
-                const currentLinks = store.links();
-                patchState(store, {
-                  links: currentLinks.filter((l) => l.id !== id),
-                  isSaving: false,
-                  error: null,
-                });
+                this.state.update((s) => ({
+                  ...s,
+                  links: s.links.filter((l) => l.id !== params.id),
+                }));
               }
-            }),
-            catchError((err: unknown) => {
-              const errorMessage =
-                err instanceof Error
-                  ? err.message
-                  : "Failed to delete review link";
-              patchState(store, { isSaving: false, error: errorMessage });
-              return from([]);
-            }),
-          ),
-        ),
-      ),
-    ),
-  })),
-);
+            },
+            error: (err: unknown) => {
+              this.state.update((s) => ({
+                ...s,
+                error:
+                  err instanceof Error
+                    ? err.message
+                    : "Failed to delete review link",
+              }));
+            },
+            finalize: () => {
+              this.state.update((s) => ({ ...s, isSaving: false }));
+            },
+          })
+        );
+      })
+    )
+  );
+}

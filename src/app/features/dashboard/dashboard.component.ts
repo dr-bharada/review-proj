@@ -1,20 +1,25 @@
-import { Component, inject, signal, type OnInit } from "@angular/core";
+import { Component, inject, type OnInit, effect } from "@angular/core";
+import { NgComponentOutlet } from "@angular/common";
 import { Router, ActivatedRoute } from "@angular/router";
+import { toSignal } from "@angular/core/rxjs-interop";
+import { map } from "rxjs";
 import { BusinessProfileComponent } from "../business/business-profile.component";
-import { ReviewLinksComponent } from "../review-links/review-links.component";
-import { QrCodeManagerComponent } from "../qr-codes/qr-code-manager.component";
-import { AnalyticsComponent } from "../analytics/analytics.component";
+import { DashboardHeaderComponent } from "./components/dashboard-header/dashboard-header.component";
+import { DashboardSidebarComponent } from "./components/dashboard-sidebar/dashboard-sidebar.component";
+import { DashboardHomeComponent } from "./components/dashboard-home/dashboard-home.component";
 import { AuthStore } from "../../state/auth/auth.store";
 import { BusinessStore } from "../../state/business/business.store";
 import type { Business } from "../../core/models";
+import { type DashboardTab, VALID_TABS, NAV_ITEMS } from "./dashboard.config";
 
 @Component({
   selector: "app-dashboard",
   imports: [
+    NgComponentOutlet,
     BusinessProfileComponent,
-    ReviewLinksComponent,
-    QrCodeManagerComponent,
-    AnalyticsComponent,
+    DashboardHeaderComponent,
+    DashboardSidebarComponent,
+    DashboardHomeComponent,
   ],
   templateUrl: "./dashboard.component.html",
 })
@@ -28,52 +33,40 @@ export class DashboardComponent implements OnInit {
   businessProfile = this.businessStore.profile;
   currentUser = this.authStore.user;
 
-  readonly validTabs = [
-    "home",
-    "links",
-    "qrcode",
-    "analytics",
-    "profile",
-  ] as const;
-
-  activeTab = signal<"home" | "links" | "profile" | "qrcode" | "analytics">(
-    "home",
+  readonly validTabs = VALID_TABS;
+  activeTab = toSignal(
+    this.route.queryParamMap.pipe(
+      map((params) => {
+        const tab = params.get("tab") as DashboardTab | null;
+        const isValid = tab && this.validTabs.includes(tab);
+        return isValid ? tab : "home";
+      }),
+    ),
+    { initialValue: "home" as DashboardTab },
   );
+  navItems = NAV_ITEMS;
 
-  navItems: {
-    tab: "home" | "links" | "qrcode" | "analytics" | "profile";
-    label: string;
-    icon: string;
-  }[] = [
-    { tab: "home", label: "Home", icon: "pi pi-home" },
-    { tab: "links", label: "Review Links", icon: "pi pi-link" },
-    { tab: "qrcode", label: "QR Code", icon: "pi pi-qrcode" },
-    { tab: "analytics", label: "Analytics", icon: "pi pi-chart-bar" },
-    { tab: "profile", label: "Edit Profile", icon: "pi pi-pencil" },
-  ];
-
-  ngOnInit() {
-    this.businessStore.loadBusiness();
-
-    // Restore tab from query param on load / refresh
-    this.route.queryParamMap.subscribe((params) => {
-      const tab = params.get("tab") as
-        | "home"
-        | "links"
-        | "profile"
-        | "qrcode"
-        | "analytics"
-        | null;
-      const isValid = tab && this.validTabs.includes(tab as never);
-      this.activeTab.set(
-        isValid
-          ? (tab as "home" | "links" | "profile" | "qrcode" | "analytics")
-          : "home",
-      );
+  constructor() {
+    // React to profile updates when on the profile tab to redirect to home
+    effect(() => {
+      const success = this.businessStore.success();
+      if (success && this.activeTab() === "profile") {
+        this.setTab("home");
+      }
     });
   }
 
-  setTab(tab: "home" | "links" | "profile" | "qrcode" | "analytics") {
+  getTabInputs(tab: DashboardTab) {
+    const businessId = this.businessProfile()?.id;
+    if (tab === "profile") return {};
+    return { businessId };
+  }
+
+  ngOnInit() {
+    this.businessStore.loadBusiness();
+  }
+
+  setTab(tab: DashboardTab) {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { tab },

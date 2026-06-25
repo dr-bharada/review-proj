@@ -1,0 +1,42 @@
+<div class="space-y-4">
+  <!-- Welcome banner -->
+  <div
+    class="relative overflow-hidden p-6 bg-gradient-to-br from-violet-900/25 to-slate-900/60 border border-violet-800/25 rounded-2xl">
+    <div class="absolute top-0 right-0 w-40 h-40 bg-fuchsia-500/6 rounded-full blur-2xl pointer-events-none">
+    </div>
+    <div class="relative flex items-center gap-4">
+      <div
+        class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-violet-500/20">
+        <i class="pi pi-home text-white text-sm"></i>
+      </div>
+      <div>
+        <h2 class="text-lg font-extrabold text-slate-100">
+          Welcome back, <span
+            class="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">{{ profile().business_name }}</span>!
+        </h2>
+        <p class="text-sm text-slate-400 mt-0.5">Manage your links, QR codes, and review analytics from here.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick action cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    @for (item of navItems(); track item.tab) {
+    @if (item.tab !== 'home' && item.theme) {
+    <button (click)="tabSelected.emit(item.tab)"
+      [class]="'group text-left p-5 bg-slate-900/80 border border-slate-800/70 rounded-2xl hover:bg-slate-900 transition-all duration-200 cursor-pointer ' + item.theme.hoverBorder">
+      <div class="flex items-start justify-between mb-4">
+        <div
+          [class]="'w-9 h-9 rounded-xl border flex items-center justify-center group-hover:scale-105 transition-transform duration-200 ' + item.theme.iconBg + ' ' + item.theme.iconBorder">
+          <i [class]="item.icon + ' text-sm ' + item.theme.iconText"></i>
+        </div>
+        <i
+          [class]="'pi pi-arrow-right text-slate-600 group-hover:translate-x-0.5 transition-all duration-200 text-xs mt-1 ' + item.theme.arrowHover"></i>
+      </div>
+      <h3 class="font-bold text-slate-100 text-sm">{{ item.label }}</h3>
+      <p class="text-xs text-slate-500 mt-1 leading-relaxed">{{ item.description }}</p>
+    </button>
+    }
+    }
+  </div>
+</div>

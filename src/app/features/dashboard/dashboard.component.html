@@ -11,59 +11,8 @@
   <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-5 space-y-5">
 
     <!-- ===== TOP NAVBAR ===== -->
-    <header
-      class="flex items-center justify-between gap-4 bg-slate-900/80 backdrop-blur-xl border border-slate-800/70 px-5 py-3.5 rounded-2xl shadow-lg">
-
-      <!-- LEFT: Brand -->
-      <div class="flex items-center gap-3 min-w-0">
-        <div
-          class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-md shadow-violet-500/30 flex-shrink-0">
-          <i class="pi pi-star-fill text-white text-xs"></i>
-        </div>
-        <div class="flex-shrink-0">
-          <span
-            class="text-sm font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">ReviewBoost</span>
-        </div>
-
-        @if (businessProfile()) {
-        <div class="hidden sm:flex items-center gap-2 ml-1 pl-3 border-l border-slate-800">
-          <div class="w-5 h-5 rounded-md bg-slate-800 border border-slate-700/60 overflow-hidden flex-shrink-0">
-            @if (businessProfile()?.logo_url) {
-            <img [src]="businessProfile()?.logo_url!" alt="logo" class="w-full h-full object-cover" />
-            } @else {
-            <div class="w-full h-full flex items-center justify-center">
-              <i class="pi pi-briefcase text-[8px] text-slate-500"></i>
-            </div>
-            }
-          </div>
-          <span class="text-sm font-semibold text-slate-300 truncate max-w-[120px]">{{ businessProfile()?.business_name
-            }}</span>
-          <span
-            class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-800/50 px-2 py-0.5 rounded-full flex-shrink-0">
-            <span class="w-1 h-1 rounded-full bg-emerald-400 animate-pulse"></span>
-            Live
-          </span>
-        </div>
-        }
-      </div>
-
-      <!-- RIGHT: User + logout -->
-      <div class="flex items-center gap-2.5 flex-shrink-0">
-        <div
-          class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-800/60 border border-slate-700/50 rounded-xl">
-          <div
-            class="w-5 h-5 rounded-full bg-gradient-to-br from-violet-500/30 to-fuchsia-500/30 border border-violet-700/40 flex items-center justify-center">
-            <i class="pi pi-user text-[9px] text-violet-400"></i>
-          </div>
-          <span class="text-xs text-slate-400 font-medium max-w-[160px] truncate">{{ currentUser()?.email }}</span>
-        </div>
-        <button (click)="logout()"
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-400 hover:text-rose-300 bg-rose-950/20 hover:bg-rose-950/40 border border-rose-900/40 hover:border-rose-800/50 cursor-pointer transition-all duration-200">
-          <i class="pi pi-sign-out text-[10px]"></i>
-          Logout
-        </button>
-      </div>
-    </header>
+    <app-dashboard-header class="block" [profile]="businessProfile()" [currentUser]="currentUser()"
+      (logout)="logout()" />
 
     @if (isLoading()) {
     <div class="flex items-center justify-center p-24 bg-slate-900/40 border border-slate-800/60 rounded-2xl">
@@ -74,8 +23,34 @@
     </div>
     } @else {
 
+    @if (businessProfile(); as profile) {
+    <!-- DASHBOARD MODE -->
+    <div class="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-5 items-start">
+
+      <!-- ===== SIDEBAR ===== -->
+      <app-dashboard-sidebar [profile]="profile" [activeTab]="activeTab()" [navItems]="navItems"
+        (tabSelected)="setTab($event)"></app-dashboard-sidebar>
+
+      <!-- ===== MAIN CONTENT ===== -->
+      <main class="space-y-5 min-w-0">
+
+        <!-- HOME VIEW -->
+        @if (activeTab() === "home") {
+        <app-dashboard-home [profile]="profile" [navItems]="navItems"
+          (tabSelected)="setTab($event)"></app-dashboard-home>
+        }
+
+        @for (item of navItems; track item.tab) {
+        @if (activeTab() === item.tab && item.component) {
+        <ng-container *ngComponentOutlet="item.component; inputs: getTabInputs(item.tab)"></ng-container>
+        }
+        }
+
+      </main>
+    </div>
+
+    } @else {
     <!-- SETUP MODE -->
-    @if (!businessProfile()) {
     <div class="space-y-5">
       <div
         class="relative overflow-hidden p-10 bg-gradient-to-br from-violet-900/30 to-fuchsia-900/20 border border-violet-700/30 rounded-2xl text-center space-y-4">
@@ -98,196 +73,7 @@
           </div>
         </div>
       </div>
-      <app-business-profile (profileUpdated)="onProfileUpdated($event)"></app-business-profile>
-    </div>
-
-    } @else {
-    <!-- DASHBOARD MODE -->
-    <div class="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-5 items-start">
-
-      <!-- ===== SIDEBAR ===== -->
-      <aside class="space-y-3">
-
-        <!-- Business card -->
-        <div
-          class="relative overflow-hidden bg-slate-900/80 backdrop-blur-md border border-slate-800/70 rounded-2xl shadow-xl">
-          <!-- Top accent -->
-          <div class="h-[2px] bg-gradient-to-r from-violet-500 via-fuchsia-500 to-transparent rounded-t-2xl"></div>
-
-          <div class="p-5 flex flex-col items-center text-center space-y-3">
-            <!-- Logo -->
-            <div class="relative mt-1">
-              <div
-                class="w-[72px] h-[72px] rounded-2xl overflow-hidden bg-slate-800 border-2 border-slate-700/60 flex items-center justify-center shadow-lg">
-                @if (businessProfile()?.logo_url) {
-                <img [src]="businessProfile()?.logo_url!" alt="Logo" class="w-full h-full object-cover" />
-                } @else {
-                <div
-                  class="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
-                  <i class="pi pi-image text-xl text-slate-600"></i>
-                </div>
-                }
-              </div>
-              <!-- Active indicator -->
-              <div
-                class="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-400 rounded-full border-2 border-slate-900 shadow-sm">
-              </div>
-            </div>
-
-            <div class="space-y-1.5">
-              <h3 class="font-bold text-slate-100 text-base leading-tight">{{ businessProfile()?.business_name }}</h3>
-              <span
-                class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-violet-900/50 text-violet-300 border border-violet-700/40 uppercase tracking-wider">
-                {{ businessProfile()?.category }}
-              </span>
-            </div>
-
-            <!-- Stats row -->
-            <div class="w-full grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/60">
-              <div class="bg-slate-950/50 rounded-xl p-2 text-center">
-                <p class="text-[10px] text-slate-500 font-medium uppercase tracking-wide">Plan</p>
-                <p class="text-xs font-bold text-slate-300 mt-0.5 capitalize">{{ businessProfile()?.subscription_plan }}
-                </p>
-              </div>
-              <div class="bg-slate-950/50 rounded-xl p-2 text-center">
-                <p class="text-[10px] text-slate-500 font-medium uppercase tracking-wide">Status</p>
-                <p class="text-xs font-bold text-emerald-400 mt-0.5">Active</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Navigation -->
-        <nav class="bg-slate-900/80 backdrop-blur-md border border-slate-800/70 p-2 rounded-2xl shadow-xl space-y-0.5">
-          @for (item of navItems; track item.tab) {
-          <button (click)="setTab(item.tab)" [class]="
-                    'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 cursor-pointer ' +
-                    (activeTab() === item.tab
-                      ? 'bg-violet-600/20 text-violet-300 shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60')
-                  ">
-            <i
-              [class]="item.icon + ' text-sm flex-shrink-0 ' + (activeTab() === item.tab ? 'text-violet-400' : 'text-slate-500')"></i>
-            <span>{{ item.label }}</span>
-            @if (activeTab() === item.tab) {
-            <span class="ml-auto w-1.5 h-1.5 rounded-full bg-violet-400 flex-shrink-0"></span>
-            }
-          </button>
-          }
-        </nav>
-      </aside>
-
-      <!-- ===== MAIN CONTENT ===== -->
-      <main class="space-y-5 min-w-0">
-
-        <!-- HOME VIEW -->
-        @if (activeTab() === "home") {
-        <div class="space-y-4">
-
-          <!-- Welcome banner -->
-          <div
-            class="relative overflow-hidden p-6 bg-gradient-to-br from-violet-900/25 to-slate-900/60 border border-violet-800/25 rounded-2xl">
-            <div class="absolute top-0 right-0 w-40 h-40 bg-fuchsia-500/6 rounded-full blur-2xl pointer-events-none">
-            </div>
-            <div class="relative flex items-center gap-4">
-              <div
-                class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-violet-500/20">
-                <i class="pi pi-home text-white text-sm"></i>
-              </div>
-              <div>
-                <h2 class="text-lg font-extrabold text-slate-100">
-                  Welcome back, <span
-                    class="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">{{
-                    businessProfile()?.business_name }}</span>!
-                </h2>
-                <p class="text-sm text-slate-400 mt-0.5">Manage your links, QR codes, and review analytics from here.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Quick action cards -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-
-            <button (click)="setTab('links')"
-              class="group text-left p-5 bg-slate-900/80 border border-slate-800/70 rounded-2xl hover:border-violet-700/50 hover:bg-slate-900 transition-all duration-200 cursor-pointer">
-              <div class="flex items-start justify-between mb-4">
-                <div
-                  class="w-9 h-9 rounded-xl bg-violet-900/60 border border-violet-700/40 flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
-                  <i class="pi pi-link text-violet-400 text-sm"></i>
-                </div>
-                <i
-                  class="pi pi-arrow-right text-slate-600 group-hover:text-violet-400 group-hover:translate-x-0.5 transition-all duration-200 text-xs mt-1"></i>
-              </div>
-              <h3 class="font-bold text-slate-100 text-sm">Review Links</h3>
-              <p class="text-xs text-slate-500 mt-1 leading-relaxed">Connect Google, Facebook, Swiggy and more.</p>
-            </button>
-
-            <button (click)="setTab('qrcode')"
-              class="group text-left p-5 bg-slate-900/80 border border-slate-800/70 rounded-2xl hover:border-fuchsia-700/50 hover:bg-slate-900 transition-all duration-200 cursor-pointer">
-              <div class="flex items-start justify-between mb-4">
-                <div
-                  class="w-9 h-9 rounded-xl bg-fuchsia-900/60 border border-fuchsia-700/40 flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
-                  <i class="pi pi-qrcode text-fuchsia-400 text-sm"></i>
-                </div>
-                <i
-                  class="pi pi-arrow-right text-slate-600 group-hover:text-fuchsia-400 group-hover:translate-x-0.5 transition-all duration-200 text-xs mt-1"></i>
-              </div>
-              <h3 class="font-bold text-slate-100 text-sm">QR Code</h3>
-              <p class="text-xs text-slate-500 mt-1 leading-relaxed">Generate a shareable QR code for customers.</p>
-            </button>
-
-            <button (click)="setTab('analytics')"
-              class="group text-left p-5 bg-slate-900/80 border border-slate-800/70 rounded-2xl hover:border-emerald-700/50 hover:bg-slate-900 transition-all duration-200 cursor-pointer">
-              <div class="flex items-start justify-between mb-4">
-                <div
-                  class="w-9 h-9 rounded-xl bg-emerald-900/60 border border-emerald-700/40 flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
-                  <i class="pi pi-chart-bar text-emerald-400 text-sm"></i>
-                </div>
-                <i
-                  class="pi pi-arrow-right text-slate-600 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all duration-200 text-xs mt-1"></i>
-              </div>
-              <h3 class="font-bold text-slate-100 text-sm">Analytics</h3>
-              <p class="text-xs text-slate-500 mt-1 leading-relaxed">Track clicks and see which platforms perform best.
-              </p>
-            </button>
-
-            <button (click)="setTab('profile')"
-              class="group text-left p-5 bg-slate-900/80 border border-slate-800/70 rounded-2xl hover:border-amber-700/50 hover:bg-slate-900 transition-all duration-200 cursor-pointer">
-              <div class="flex items-start justify-between mb-4">
-                <div
-                  class="w-9 h-9 rounded-xl bg-amber-900/60 border border-amber-700/40 flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
-                  <i class="pi pi-pencil text-amber-400 text-sm"></i>
-                </div>
-                <i
-                  class="pi pi-arrow-right text-slate-600 group-hover:text-amber-400 group-hover:translate-x-0.5 transition-all duration-200 text-xs mt-1"></i>
-              </div>
-              <h3 class="font-bold text-slate-100 text-sm">Edit Profile</h3>
-              <p class="text-xs text-slate-500 mt-1 leading-relaxed">Update your business details, logo and branding.
-              </p>
-            </button>
-
-          </div>
-        </div>
-        }
-
-        @if (activeTab() === "links") {
-        <app-review-links [businessId]="businessProfile()!.id!"></app-review-links>
-        }
-
-        @if (activeTab() === "qrcode") {
-        <app-qr-code-manager [businessId]="businessProfile()!.id!"></app-qr-code-manager>
-        }
-
-        @if (activeTab() === "analytics") {
-        <app-analytics [businessId]="businessProfile()!.id!"></app-analytics>
-        }
-
-        @if (activeTab() === "profile") {
-        <app-business-profile (profileUpdated)="onProfileUpdated($event)"></app-business-profile>
-        }
-
-      </main>
+      <app-business-profile (profileUpdated)="onProfileUpdated($event)" />
     </div>
     }
     }

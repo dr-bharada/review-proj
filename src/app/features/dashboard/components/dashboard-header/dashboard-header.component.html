@@ -1,0 +1,51 @@
+<header
+  class="flex items-center justify-between gap-4 bg-slate-900/80 backdrop-blur-xl border border-slate-800/70 px-5 py-3.5 rounded-2xl shadow-lg">
+
+  <!-- LEFT: Brand -->
+  <div class="flex items-center gap-3 min-w-0">
+    <div
+      class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-md shadow-violet-500/30 flex-shrink-0">
+      <i class="pi pi-star-fill text-white text-xs"></i>
+    </div>
+    <div class="flex-shrink-0">
+      <span
+        class="text-sm font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">ReviewBoost</span>
+    </div>
+
+    @if (profile()) {
+    <div class="hidden sm:flex items-center gap-2 ml-1 pl-3 border-l border-slate-800">
+      <div class="w-5 h-5 rounded-md bg-slate-800 border border-slate-700/60 overflow-hidden flex-shrink-0">
+        @if (profile()?.logo_url) {
+        <img [src]="profile()?.logo_url" alt="logo" class="w-full h-full object-cover" />
+        } @else {
+        <div class="w-full h-full flex items-center justify-center">
+          <i class="pi pi-briefcase text-[8px] text-slate-500"></i>
+        </div>
+        }
+      </div>
+      <span class="text-sm font-semibold text-slate-300 truncate max-w-[120px]">{{ profile()?.business_name }}</span>
+      <span
+        class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-800/50 px-2 py-0.5 rounded-full flex-shrink-0">
+        <span class="w-1 h-1 rounded-full bg-emerald-400 animate-pulse"></span>
+        Live
+      </span>
+    </div>
+    }
+  </div>
+
+  <!-- RIGHT: User + logout -->
+  <div class="flex items-center gap-2.5 flex-shrink-0">
+    <div class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-800/60 border border-slate-700/50 rounded-xl">
+      <div
+        class="w-5 h-5 rounded-full bg-gradient-to-br from-violet-500/30 to-fuchsia-500/30 border border-violet-700/40 flex items-center justify-center">
+        <i class="pi pi-user text-[9px] text-violet-400"></i>
+      </div>
+      <span class="text-xs text-slate-400 font-medium max-w-[160px] truncate">{{ currentUser()?.email }}</span>
+    </div>
+    <button (click)="logout.emit()"
+      class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-400 hover:text-rose-300 bg-rose-950/20 hover:bg-rose-950/40 border border-rose-900/40 hover:border-rose-800/50 cursor-pointer transition-all duration-200">
+      <i class="pi pi-sign-out text-[10px]"></i>
+      Logout
+    </button>
+  </div>
+</header>

@@ -1,0 +1,113 @@
+<div class="bg-slate-900/70 backdrop-blur-md border border-slate-800/80 rounded-2xl shadow-xl overflow-hidden">
+
+  <!-- Panel header -->
+  <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800/60">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+        <i class="pi pi-list text-emerald-400 text-xs"></i>
+      </div>
+      <div>
+        <h3 class="text-sm font-bold text-slate-100 leading-tight">Configured Links</h3>
+        <p class="text-[11px] text-slate-500 leading-none mt-0.5">Appear on your public review page</p>
+      </div>
+    </div>
+    @if (reviewLinks().length > 0) {
+    <span
+      class="text-xs font-semibold px-2.5 py-1 rounded-full bg-violet-900/50 text-violet-300 border border-violet-700/40">
+      {{ reviewLinks().length }} link{{ reviewLinks().length === 1 ? '' : 's' }}
+    </span>
+    }
+  </div>
+
+  <!-- Body -->
+  <div class="p-4">
+    @if (isLoading()) {
+    <div class="flex items-center justify-center py-12 gap-3">
+      <div class="w-6 h-6 rounded-full border-2 border-violet-500 border-t-transparent animate-spin"></div>
+      <span class="text-sm text-slate-400">Loading links...</span>
+    </div>
+
+    } @else if (reviewLinks().length === 0) {
+    <!-- Empty state -->
+    <div class="flex flex-col items-center justify-center py-12 gap-3">
+      <div
+        class="w-14 h-14 rounded-2xl bg-slate-800/60 border border-dashed border-slate-700 flex items-center justify-center mb-1">
+        <i class="pi pi-link text-2xl text-slate-600"></i>
+      </div>
+      <p class="text-sm font-semibold text-slate-400">No review links yet</p>
+      <p class="text-xs text-slate-600 text-center max-w-xs">Add your first link above to start directing customers to
+        your review pages.</p>
+    </div>
+
+    } @else {
+    <!-- Links list -->
+    <div class="space-y-2">
+      @for (link of reviewLinks(); track link.id) {
+      <div
+        class="group flex items-center justify-between p-4 bg-slate-950/50 border border-slate-800/60 hover:border-slate-700/80 rounded-xl transition-all duration-200 gap-4">
+
+        <!-- Left: Icon + info -->
+        <div class="flex items-center gap-3 min-w-0">
+          <div
+            class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700/60 flex items-center justify-center flex-shrink-0 shadow-sm">
+            <i [className]="getPlatformIcon(link.platform_name) + ' text-violet-300 text-base'"></i>
+          </div>
+          <div class="min-w-0">
+            <h4 class="font-semibold text-slate-200 text-sm leading-tight">{{ link.platform_name }}</h4>
+            <a [href]="link.platform_url" target="_blank" rel="noopener noreferrer"
+              class="text-xs text-slate-500 hover:text-violet-400 hover:underline transition-colors truncate block max-w-[180px] sm:max-w-sm mt-0.5"
+              [title]="link.platform_url">
+              {{ link.platform_url }}
+            </a>
+          </div>
+        </div>
+
+        <!-- Right: Toggle + actions -->
+        <div class="flex items-center gap-3 flex-shrink-0">
+
+          <!-- Toggle -->
+          <label class="relative inline-flex inline-flex items-center cursor-pointer gap-2">
+            <input type="checkbox" [checked]="link.is_enabled" (change)="toggleLink(link)" class="sr-only peer" />
+            <div class="w-9 h-5 bg-slate-800 rounded-full peer transition-colors peer-checked:bg-violet-600 relative">
+              <div
+                [className]="'absolute top-[2px] left-[2px] w-4 h-4 rounded-full shadow-sm transition-all duration-200 ' + (link.is_enabled ? 'translate-x-4 bg-white' : 'bg-slate-500')">
+              </div>
+            </div>
+            <span class="text-[11px] hidden sm:block font-medium"
+              [className]="link.is_enabled ? 'text-emerald-400' : 'text-slate-500'">
+              {{ link.is_enabled ? "Live" : "Off" }}
+            </span>
+          </label>
+
+          <!-- Divider -->
+          <div class="w-px h-6 bg-slate-800 hidden sm:block"></div>
+
+          <!-- Copy -->
+          <button (click)="copyToClipboard(link.platform_url, link.id!)"
+            class="w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer"
+            [class]="copiedLinkId() === link.id ? 'bg-emerald-950/40 border border-emerald-800/50 text-emerald-400' : 'bg-slate-800/50 hover:bg-slate-700 border border-slate-700/50 text-slate-400 hover:text-violet-300'"
+            [title]="copiedLinkId() === link.id ? 'Copied!' : 'Copy link'">
+            <i [class]="copiedLinkId() === link.id ? 'pi pi-check text-xs' : 'pi pi-copy text-xs'"></i>
+          </button>
+
+          <!-- Edit -->
+          <button (click)="handleEdit(link)"
+            class="w-8 h-8 rounded-lg bg-slate-800/50 hover:bg-slate-700 border border-slate-700/50 flex items-center justify-center text-slate-400 hover:text-violet-300 transition-all cursor-pointer"
+            title="Edit link">
+            <i class="pi pi-pencil text-xs"></i>
+          </button>
+
+          <!-- Delete -->
+          <button (click)="deleteLink(link.id!)"
+            class="w-8 h-8 rounded-lg bg-slate-800/50 hover:bg-rose-950/60 border border-slate-700/50 hover:border-rose-800/50 flex items-center justify-center text-slate-400 hover:text-rose-400 transition-all cursor-pointer"
+            title="Delete link">
+            <i class="pi pi-trash text-xs"></i>
+          </button>
+
+        </div>
+      </div>
+      }
+    </div>
+    }
+  </div>
+</div>

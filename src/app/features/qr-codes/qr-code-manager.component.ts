@@ -7,9 +7,17 @@ import {
   type OnDestroy,
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { from, Subject, takeUntil, switchMap, tap, catchError, EMPTY } from "rxjs";
-import { Clipboard } from "@angular/cdk/clipboard";
+import {
+  from,
+  Subject,
+  takeUntil,
+  switchMap,
+  tap,
+  catchError,
+  EMPTY,
+} from "rxjs";
 import { QrCodeStore } from "../../state/qr-code/qr-code.store";
+import { Clipboard } from "@angular/cdk/clipboard";
 import { environment } from "../../../environments/environment";
 
 @Component({
@@ -46,7 +54,10 @@ export class QrCodeManagerComponent implements OnInit, OnDestroy {
   claimSlug(): void {
     const slug = this.desiredSlug.trim();
     if (!slug) {
-      this.store.state.update((s) => ({ ...s, error: "Slug cannot be empty." }));
+      this.store.state.update((s) => ({
+        ...s,
+        error: "Slug cannot be empty.",
+      }));
       return;
     }
     this.store.claimSlug(this.businessId(), slug);
@@ -92,7 +103,10 @@ export class QrCodeManagerComponent implements OnInit, OnDestroy {
                   const canvas = document.createElement("canvas");
                   canvas.width = W;
                   canvas.height = H;
-                  const ctx = canvas.getContext("2d")!;
+                  const ctx = canvas.getContext("2d");
+                  if (!ctx) {
+                    throw new Error("Failed to get 2D context");
+                  }
 
                   // Background
                   const bg = ctx.createLinearGradient(0, 0, W, H);
@@ -138,8 +152,17 @@ export class QrCodeManagerComponent implements OnInit, OnDestroy {
                   ctx.stroke();
 
                   // Star icon circle
-                  const cx = W / 2, cy = 96, cr = 40;
-                  const iconGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, cr);
+                  const cx = W / 2,
+                    cy = 96,
+                    cr = 40;
+                  const iconGrad = ctx.createRadialGradient(
+                    cx,
+                    cy,
+                    0,
+                    cx,
+                    cy,
+                    cr,
+                  );
                   iconGrad.addColorStop(0, "rgba(139,92,246,0.45)");
                   iconGrad.addColorStop(1, "rgba(139,92,246,0.08)");
                   ctx.fillStyle = iconGrad;
@@ -168,7 +191,10 @@ export class QrCodeManagerComponent implements OnInit, OnDestroy {
                   ctx.textAlign = "center";
                   ctx.textBaseline = "alphabetic";
                   let name = businessName || slug;
-                  while (ctx.measureText(name).width > W - 80 && name.length > 4) {
+                  while (
+                    ctx.measureText(name).width > W - 80 &&
+                    name.length > 4
+                  ) {
                     name = name.slice(0, -1);
                   }
                   if (name !== (businessName || slug)) name += "…";
@@ -177,11 +203,17 @@ export class QrCodeManagerComponent implements OnInit, OnDestroy {
                   // Sub-label
                   ctx.fillStyle = "#64748b";
                   ctx.font = "14px sans-serif";
-                  ctx.fillText("Share this code with your customers", W / 2, 248);
+                  ctx.fillText(
+                    "Share this code with your customers",
+                    W / 2,
+                    248,
+                  );
 
                   // QR card
-                  const qrSize = 400, qrPad = 24;
-                  const qrX = (W - qrSize) / 2, qrY = 272;
+                  const qrSize = 400,
+                    qrPad = 24;
+                  const qrX = (W - qrSize) / 2,
+                    qrY = 272;
                   ctx.shadowColor = "rgba(139,92,246,0.3)";
                   ctx.shadowBlur = 48;
                   ctx.fillStyle = "#ffffff";
@@ -189,7 +221,13 @@ export class QrCodeManagerComponent implements OnInit, OnDestroy {
                   ctx.roundRect(qrX, qrY, qrSize, qrSize, 24);
                   ctx.fill();
                   ctx.shadowBlur = 0;
-                  ctx.drawImage(qrImg, qrX + qrPad, qrY + qrPad, qrSize - qrPad * 2, qrSize - qrPad * 2);
+                  ctx.drawImage(
+                    qrImg,
+                    qrX + qrPad,
+                    qrY + qrPad,
+                    qrSize - qrPad * 2,
+                    qrSize - qrPad * 2,
+                  );
                   ctx.strokeStyle = "rgba(139,92,246,0.35)";
                   ctx.lineWidth = 2;
                   ctx.beginPath();
@@ -197,18 +235,23 @@ export class QrCodeManagerComponent implements OnInit, OnDestroy {
                   ctx.stroke();
 
                   // Corner dots
-                  [[qrX - 12, qrY - 12], [qrX + qrSize + 12, qrY - 12],
-                   [qrX - 12, qrY + qrSize + 12], [qrX + qrSize + 12, qrY + qrSize + 12]]
-                    .forEach(([dx, dy]) => {
-                      ctx.fillStyle = "rgba(139,92,246,0.6)";
-                      ctx.beginPath();
-                      ctx.arc(dx, dy, 5, 0, Math.PI * 2);
-                      ctx.fill();
-                    });
+                  [
+                    [qrX - 12, qrY - 12],
+                    [qrX + qrSize + 12, qrY - 12],
+                    [qrX - 12, qrY + qrSize + 12],
+                    [qrX + qrSize + 12, qrY + qrSize + 12],
+                  ].forEach(([dx, dy]) => {
+                    ctx.fillStyle = "rgba(139,92,246,0.6)";
+                    ctx.beginPath();
+                    ctx.arc(dx, dy, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                  });
 
                   // URL pill
-                  const pillW = 580, pillH = 54;
-                  const pillX = (W - pillW) / 2, pillY = qrY + qrSize + 36;
+                  const pillW = 580,
+                    pillH = 54;
+                  const pillX = (W - pillW) / 2,
+                    pillY = qrY + qrSize + 36;
                   ctx.fillStyle = "rgba(13,11,24,0.95)";
                   ctx.strokeStyle = "rgba(139,92,246,0.45)";
                   ctx.lineWidth = 1.5;
@@ -225,7 +268,10 @@ export class QrCodeManagerComponent implements OnInit, OnDestroy {
                   ctx.textAlign = "center";
                   ctx.textBaseline = "middle";
                   let urlText = publicUrl;
-                  while (ctx.measureText(urlText).width > pillW - 56 && urlText.length > 8) {
+                  while (
+                    ctx.measureText(urlText).width > pillW - 56 &&
+                    urlText.length > 8
+                  ) {
                     urlText = urlText.slice(0, -1);
                   }
                   if (urlText !== publicUrl) urlText += "…";
@@ -256,7 +302,10 @@ export class QrCodeManagerComponent implements OnInit, OnDestroy {
 
                   // Export
                   canvas.toBlob((pngBlob) => {
-                    if (!pngBlob) { reject(new Error("Canvas export failed")); return; }
+                    if (!pngBlob) {
+                      reject(new Error("Canvas export failed"));
+                      return;
+                    }
                     const a = document.createElement("a");
                     a.href = URL.createObjectURL(pngBlob);
                     a.download = `review-qr-${slug}.png`;
@@ -267,7 +316,9 @@ export class QrCodeManagerComponent implements OnInit, OnDestroy {
                     URL.revokeObjectURL(qrObjectUrl);
                     resolve();
                   }, "image/png");
-                } catch (e) { reject(e); }
+                } catch (e) {
+                  reject(e);
+                }
               };
 
               qrImg.onerror = reject;
