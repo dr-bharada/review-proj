@@ -65,10 +65,10 @@ export class ReviewLinksStore {
             finalize: () => {
               this.state.update((s) => ({ ...s, isLoading: false }));
             },
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   readonly addLink = rxMethod<{ link: ReviewLink; onSuccess?: () => void }>(
@@ -108,10 +108,10 @@ export class ReviewLinksStore {
             finalize: () => {
               this.state.update((s) => ({ ...s, isSaving: false }));
             },
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   readonly updateLink = rxMethod<{
@@ -157,10 +157,10 @@ export class ReviewLinksStore {
               finalize: () => {
                 this.state.update((s) => ({ ...s, isSaving: false }));
               },
-            })
+            }),
           );
-      })
-    )
+      }),
+    ),
   );
 
   readonly deleteLink = rxMethod<{ id: string }>(
@@ -194,9 +194,9 @@ export class ReviewLinksStore {
             finalize: () => {
               this.state.update((s) => ({ ...s, isSaving: false }));
             },
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 }
