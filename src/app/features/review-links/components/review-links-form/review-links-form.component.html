@@ -46,7 +46,7 @@
             optionValue="value" placeholder="Select platform" appendTo="body"
             [attr.aria-invalid]="linkForm.get('platform_name')?.touched && linkForm.get('platform_name')?.invalid ? 'true' : 'false'"
             [attr.aria-describedby]="linkForm.get('platform_name')?.touched && linkForm.get('platform_name')?.invalid ? 'platform-name-error' : null"
-            styleClass="w-full bg-slate-950 border border-slate-800 text-slate-100 rounded-xl transition-colors"></p-select>
+            styleClass="w-full bg-slate-950 border border-slate-800 text-slate-100 rounded-xl transition-colors" />
           @if (linkForm.get("platform_name")?.touched && linkForm.get("platform_name")?.invalid) {
           <small id="platform-name-error" class="text-xs text-rose-400 flex items-center gap-1">
             <i class="pi pi-exclamation-circle text-[10px]"></i> Required

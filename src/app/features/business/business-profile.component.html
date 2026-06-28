@@ -61,11 +61,13 @@
             }
           </div>
           <!-- Upload hover overlay -->
-          <div
-            class="absolute inset-0 rounded-2xl bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
+          <button
+            type="button"
+            aria-label="Upload logo"
+            class="absolute inset-0 rounded-2xl bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer border-0 p-0"
             (click)="logoInput.click()">
             <i class="pi pi-camera text-white text-lg"></i>
-          </div>
+          </button>
         </div>
 
         <!-- Upload info -->
@@ -110,7 +112,7 @@
             <p-dropdown id="category" formControlName="category" [options]="categories" optionLabel="label"
               optionValue="value" placeholder="Select category" appendTo="body"
               [attr.aria-invalid]="profileForm.get('category')?.touched && profileForm.get('category')?.invalid ? 'true' : 'false'"
-              styleClass="w-full bg-slate-950 border border-slate-800 text-slate-100 rounded-xl transition-colors"></p-dropdown>
+              styleClass="w-full bg-slate-950 border border-slate-800 text-slate-100 rounded-xl transition-colors" />
             @if (profileForm.get("category")?.touched && profileForm.get("category")?.invalid) {
             <small class="text-xs text-rose-400 flex items-center gap-1">
               <i class="pi pi-exclamation-circle text-[10px]"></i> Required

@@ -12,7 +12,7 @@
   <!-- Error Banner -->
   @if (errorMessage()) {
   <div class="mb-4">
-    <p-message severity="error" [text]="errorMessage()!"></p-message>
+    <p-message severity="error" [text]="errorMessage()!" />
   </div>
   }
 
@@ -47,7 +47,7 @@
       [attr.aria-describedby]="signupForm.get('password')?.touched && signupForm.get('password')?.invalid ? 'password-error' : null"
       class="w-full block" styleClass="w-full relative"
       [inputStyleClass]="'w-full bg-slate-950 text-slate-100 placeholder-slate-600 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-none rounded-xl h-[50px] px-4 pr-12 transition-all duration-200 [&:-webkit-autofill]:!shadow-[inset_0_0_0_1000px_#020617] [&:-webkit-autofill]:![-webkit-text-fill-color:#f8fafc] border ' + (signupForm.get('password')?.touched && signupForm.get('password')?.invalid ? '!border-rose-500' : '!border-slate-700')"
-      placeholder="••••••••"></p-password>
+      placeholder="••••••••" />
     @if (signupForm.get('password')?.touched && signupForm.get('password')?.invalid) {
     <small id="password-error" class="text-xs text-rose-400 mt-1.5 flex items-center gap-1.5">
       <i class="pi pi-exclamation-circle text-xs"></i>
@@ -68,7 +68,7 @@
       [attr.aria-describedby]="signupForm.touched && signupForm.errors?.['passwordMismatch'] ? 'confirm-password-error' : null"
       class="w-full block" styleClass="w-full relative"
       [inputStyleClass]="'w-full bg-slate-950 text-slate-100 placeholder-slate-600 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 focus:outline-none rounded-xl h-[50px] px-4 pr-12 transition-all duration-200 [&:-webkit-autofill]:!shadow-[inset_0_0_0_1000px_#020617] [&:-webkit-autofill]:![-webkit-text-fill-color:#f8fafc] border ' + (signupForm.touched && signupForm.errors?.['passwordMismatch'] ? '!border-rose-500' : (signupForm.get('confirmPassword')?.touched && signupForm.get('confirmPassword')?.value && !signupForm.errors?.['passwordMismatch'] ? '!border-emerald-500' : '!border-slate-700'))"
-      placeholder="••••••••"></p-password>
+      placeholder="••••••••" />
     @if (signupForm.touched && signupForm.errors?.['passwordMismatch']) {
     <small id="confirm-password-error" class="text-xs text-rose-400 mt-1.5 flex items-center gap-1.5">
       <i class="pi pi-exclamation-circle text-xs"></i>

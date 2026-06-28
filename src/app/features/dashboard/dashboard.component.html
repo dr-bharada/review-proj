@@ -29,7 +29,7 @@
 
       <!-- ===== SIDEBAR ===== -->
       <app-dashboard-sidebar [profile]="profile" [activeTab]="activeTab()" [navItems]="navItems"
-        (tabSelected)="setTab($event)"></app-dashboard-sidebar>
+        (tabSelected)="setTab($event)" />
 
       <!-- ===== MAIN CONTENT ===== -->
       <main class="space-y-5 min-w-0">
@@ -37,12 +37,12 @@
         <!-- HOME VIEW -->
         @if (activeTab() === "home") {
         <app-dashboard-home [profile]="profile" [navItems]="navItems"
-          (tabSelected)="setTab($event)"></app-dashboard-home>
+          (tabSelected)="setTab($event)" />
         }
 
         @for (item of navItems; track item.tab) {
         @if (activeTab() === item.tab && item.component) {
-        <ng-container *ngComponentOutlet="item.component; inputs: getTabInputs(item.tab)"></ng-container>
+        <ng-container *ngComponentOutlet="item.component; inputs: getTabInputs(item.tab)" />
         }
         }
 
